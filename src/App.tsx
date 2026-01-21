@@ -4,6 +4,8 @@ import { ComponentsPanel } from './components/ComponentsPanel';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { JsonPreviewPane } from './components/JsonPreviewPane';
 import { SettingsPanel } from './components/SettingsPanel';
+import { SduiPage } from './components/SduiRenderer';
+import { PreviewModal } from './components/PreviewModal';
 import { SDUISchema } from './types/sdui';
 import { useToast } from './contexts/ToastContext';
 
@@ -14,6 +16,9 @@ function App() {
   const [isImporting, setIsImporting] = useState<boolean>(false); // Flag to track import state
   const prevNavigationRef = useRef<any>(null); // Ref to track previous navigation settings
   const { toast } = useToast();
+  const [showPreviewModal, setShowPreviewModal] = useState<boolean>(false);
+  const [previewSchema, setPreviewSchema] = useState<any>(null);
+  const [previewCurrentPageId, setPreviewCurrentPageId] = useState<string>('welcome');
   const [canvasSchema, setCanvasSchema] = useState<SDUISchema>({
     id: "builder-app",
     version: "1.0",
@@ -311,10 +316,10 @@ function App() {
           <button
             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
             onClick={() => {
-              // Preview functionality - store the schema and current page ID in sessionStorage and open preview
-              sessionStorage.setItem('sdui-preview-schema', JSON.stringify(canvasSchema));
-              sessionStorage.setItem('sdui-preview-current-page-id', currentPageId);
-              window.open('/preview', '_blank', 'width=400,height=800');
+              // Preview functionality - set the schema and current page ID to state to show modal
+              setPreviewSchema(canvasSchema);
+              setPreviewCurrentPageId(currentPageId);
+              setShowPreviewModal(true);
             }}
           >
             Preview
@@ -528,8 +533,15 @@ function App() {
           </div>
         </div>
       </div>
-    </div>
-  );
+  {/* Preview Modal Component */}
+  <PreviewModal
+    isOpen={showPreviewModal}
+    onClose={() => setShowPreviewModal(false)}
+    schema={previewSchema}
+    currentPageId={previewCurrentPageId}
+  />
+</div>
+);
 }
 
 export default App;

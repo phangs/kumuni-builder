@@ -1,0 +1,11 @@
+# Static file server configuration for Render.com
+
+# Redirect all routes to index.html for SPA routing
+location ~* \.(html|css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+    try_files $uri $uri/ =404;
+}
+
+# For all other routes, serve index.html to allow client-side routing
+location / {
+    try_files $uri $uri/ /index.html;
+}
