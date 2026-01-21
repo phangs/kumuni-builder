@@ -1,0 +1,389 @@
+{
+  "success": true,
+  "message": "Form created successfully",
+  "data": {
+    "id": "f66dd0e8-bb31-4bd5-9d58-dd48eea41a53",
+    "version": "1.1.0",
+    "name": "Cedula Application",
+    "description": "Application for Cedula",
+    "slug": "cedula",
+    "is_public": false,
+    "is_published": false,
+    "published_at": null,
+    "navigation": {
+      "guestPageId": "guest-welcome",
+      "initialPageId": "welcome"
+    },
+    "pages": [
+      {
+        "id": "guest-welcome",
+        "order": 0,
+        "title": "Welcome",
+        "components": [
+          {
+            "id": "guest-welcome-image",
+            "type": "image",
+            "props": {
+              "source": "https://dev-supabase.ctoglobal.co/storage/v1/object/public/miniapp-images/Man1-min.png"
+            },
+            "gridRow": 0,
+            "rowSpan": 3
+          },
+          {
+            "id": "guest-welcome-heading",
+            "type": "heading",
+            "props": {
+              "text": "Cedula Application",
+              "style": {
+                "textAlign": "center"
+              }
+            },
+            "gridRow": 3,
+            "rowSpan": 1
+          },
+          {
+            "id": "guest-welcome-description",
+            "type": "text",
+            "props": {
+              "text": "Please sign up to continue with your application",
+              "style": {
+                "textAlign": "center"
+              }
+            },
+            "gridRow": 4,
+            "rowSpan": 2
+          },
+          {
+            "id": "guest-signup-button",
+            "type": "button",
+            "props": {
+              "title": "Sign Up",
+              "variant": "primary"
+            },
+            "action": {
+              "type": "@register",
+              "params": {}
+            },
+            "gridRow": 6,
+            "rowSpan": 1
+          }
+        ]
+      },
+      {
+        "id": "welcome",
+        "order": 1,
+        "title": "Welcome",
+        "components": [
+          {
+            "id": "welcome-image",
+            "type": "image",
+            "props": {
+              "source": "https://dev-supabase.ctoglobal.co/storage/v1/object/public/miniapp-images/Man1-min.png"
+            },
+            "gridRow": 0,
+            "rowSpan": 3
+          },
+          {
+            "id": "welcome-heading",
+            "type": "heading",
+            "props": {
+              "text": "Cedula Application",
+              "style": {
+                "textAlign": "center"
+              }
+            },
+            "gridRow": 3,
+            "rowSpan": 1
+          },
+          {
+            "id": "welcome-description",
+            "type": "text",
+            "props": {
+              "text": "Application for Cedula",
+              "style": {
+                "textAlign": "center"
+              }
+            },
+            "gridRow": 4,
+            "rowSpan": 2
+          },
+          {
+            "id": "welcome-button",
+            "type": "button",
+            "props": {
+              "title": "Get Started",
+              "variant": "primary"
+            },
+            "action": {
+              "type": "@pushPage",
+              "params": {}
+            },
+            "gridRow": 6,
+            "rowSpan": 1
+          }
+        ]
+      },
+      {
+        "id": "personal_information",
+        "order": 2,
+        "title": "Personal Information",
+        "components": [
+          {
+            "id": "form-heading",
+            "type": "heading",
+            "props": {
+              "text": "Personal Information"
+            },
+            "gridRow": 0,
+            "rowSpan": 1
+          },
+          {
+            "id": "firstName",
+            "type": "text-input",
+            "props": {
+              "label": "First Name",
+              "placeholder": "Enter your first name",
+              "keyboardType": "default",
+              "autoCapitalize": "words"
+            },
+            "gridRow": 1,
+            "rowSpan": 2,
+            "validation": {
+              "required": true,
+              "maxLength": 100,
+              "minLength": 2
+            }
+          },
+          {
+            "id": "lastName",
+            "type": "text-input",
+            "props": {
+              "label": "Last Name",
+              "placeholder": "Enter your last name",
+              "keyboardType": "default",
+              "autoCapitalize": "words"
+            },
+            "gridRow": 3,
+            "rowSpan": 2,
+            "validation": {
+              "required": true,
+              "maxLength": 100,
+              "minLength": 2
+            }
+          },
+          {
+            "id": "middleName",
+            "type": "text-input",
+            "props": {
+              "label": "Middle Name",
+              "placeholder": "Enter your middle name",
+              "keyboardType": "default",
+              "autoCapitalize": "words"
+            },
+            "gridRow": 5,
+            "rowSpan": 2,
+            "validation": {
+              "required": true,
+              "maxLength": 100,
+              "minLength": 2
+            }
+          },
+          {
+            "id": "fullAddress",
+            "type": "textarea",
+            "props": {
+              "rows": 3,
+              "label": "Full Address",
+              "placeholder": "Street Address",
+              "autoCapitalize": "sentences"
+            },
+            "gridRow": 7,
+            "rowSpan": 4,
+            "validation": {
+              "required": true,
+              "maxLength": 255,
+              "minLength": 2
+            }
+          },
+          {
+            "id": "placeOfBirth",
+            "type": "text-input",
+            "props": {
+              "label": "Place of Birth",
+              "placeholder": "Place of Birth",
+              "keyboardType": "default",
+              "autoCapitalize": "words"
+            },
+            "gridRow": 11,
+            "rowSpan": 2,
+            "validation": {
+              "required": true,
+              "maxLength": 255,
+              "minLength": 2
+            }
+          },
+          {
+            "id": "dateOfBirth",
+            "type": "date-picker",
+            "props": {
+              "label": "Date of Birth",
+              "placeholder": "Select date"
+            },
+            "gridRow": 13,
+            "rowSpan": 2,
+            "validation": {
+              "max": "today",
+              "required": true
+            }
+          },
+          {
+            "id": "form-spacer",
+            "type": "spacer",
+            "props": {
+              "size": 20
+            },
+            "gridRow": 15,
+            "rowSpan": 1
+          },
+          {
+            "id": "next-button",
+            "type": "button",
+            "props": {
+              "title": "Next",
+              "variant": "primary"
+            },
+            "action": {
+              "type": "@pushPage",
+              "params": {}
+            },
+            "gridCol": 1,
+            "gridRow": 16,
+            "rowSpan": 1
+          }
+        ]
+      },
+      {
+        "id": "review",
+        "order": 3,
+        "title": "Review & Payment",
+        "components": [
+          {
+            "id": "review-heading",
+            "type": "heading",
+            "props": {
+              "text": "Review Application"
+            },
+            "gridRow": 0,
+            "rowSpan": 1
+          },
+          {
+            "id": "review-text",
+            "type": "text",
+            "props": {
+              "text": "Please review your information before proceeding to payment. The total amount includes a convenience fee."
+            },
+            "gridRow": 1,
+            "rowSpan": 3
+          },
+          {
+            "id": "review-spacer",
+            "type": "spacer",
+            "props": {
+              "size": 20
+            },
+            "gridRow": 4,
+            "rowSpan": 1
+          },
+          {
+            "id": "back-button",
+            "type": "button",
+            "props": {
+              "title": "Back",
+              "variant": "outline"
+            },
+            "action": {
+              "type": "@popPage",
+              "params": {}
+            },
+            "gridCol": 0,
+            "gridRow": 5,
+            "rowSpan": 1
+          },
+          {
+            "id": "submit-button",
+            "type": "button",
+            "props": {
+              "title": "Proceed to Payment",
+              "variant": "primary"
+            },
+            "action": {
+              "type": "@submitForm",
+              "params": {
+                "data": {
+                  "schema_version": "1.0"
+                },
+                "endpoint": "/mobile/submission",
+                "onSuccess": {
+                  "type": "@toast",
+                  "params": {
+                    "message": "Application submitted successfully! Your application is now under review."
+                  }
+                }
+              }
+            },
+            "gridCol": 1,
+            "gridRow": 5,
+            "rowSpan": 1
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "revision": 1,
+      "createdBy": "system"
+    },
+    "created_at": "2026-01-20T10:44:27.304+00:00",
+    "updated_at": "2026-01-20T10:44:27.304+00:00",
+    "payment": {
+      "notes": [
+        {
+          "text": "Convenience fee is 10% of amount",
+          "color": "#035afc"
+        }
+      ],
+      "enabled": true,
+      "roundTo": 2,
+      "currency": "PHP",
+      "breakdowns": [
+        {
+          "id": "cedulaAmount",
+          "mode": "fixed",
+          "title": "Amount",
+          "value": 100
+        },
+        {
+          "id": "convenienceFee",
+          "mode": "formula",
+          "title": "Convenience Fee",
+          "dependsOn": [
+            "cedulaAmount"
+          ],
+          "expression": ".10 * cedulaAmount"
+        }
+      ],
+      "paymentType": "payNow"
+    },
+    "permissions": [
+      "firstName",
+      "lastName",
+      "mobileNumber",
+      "email"
+    ],
+    "statuses": [
+      "Submitted",
+      "Ready for Pickup",
+      "For Delivery",
+      "Claimed"
+    ]
+  }
+}
