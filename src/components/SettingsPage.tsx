@@ -1,199 +1,136 @@
 import React, { useState } from 'react';
 import { MainLayout } from './MainLayout';
+import { Settings, Bell, Globe, Shield, Moon, Check, ChevronRight, Monitor, MessageSquare, Mail } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
-  const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState({
     email: true,
-    push: false,
+    push: true,
     sms: false
   });
   const [language, setLanguage] = useState('en');
 
-  const handleNotificationChange = (type: string) => {
-    setNotifications(prev => ({
-      ...prev,
-      [type]: !prev[type as keyof typeof notifications]
-    }));
+  const toggleNotification = (type: keyof typeof notifications) => {
+    setNotifications(prev => ({ ...prev, [type]: !prev[type] }));
   };
 
   return (
     <MainLayout>
-      <div className="h-full overflow-y-auto custom-scrollbar px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-              <h2 className="text-lg leading-6 font-medium text-gray-900">Settings</h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Configure your account preferences and application settings.
-              </p>
+      <div className="h-full overflow-y-auto custom-scrollbar bg-background dot-pattern">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Header Section */}
+          <div className="mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
+            <div className="flex items-center gap-4 mb-2">
+              <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                <Settings size={24} />
+              </div>
+              <div>
+                <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Settings</h1>
+                <p className="text-muted-foreground leading-relaxed">System preferences and account configurations</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Sidebar Navigation */}
+            <div className="md:col-span-1 space-y-2 animate-in fade-in slide-in-from-left-4 duration-700 delay-200">
+              <NavButton icon={<Settings size={18} />} label="General" active />
+              <NavButton icon={<Bell size={18} />} label="Notifications" />
+              <NavButton icon={<Shield size={18} />} label="Security" />
+              <NavButton icon={<Globe size={18} />} label="Language" />
             </div>
 
-            <div className="px-4 py-5 sm:p-6">
-              <div className="space-y-8 divide-y divide-gray-200">
-                {/* Appearance Settings */}
+            {/* Content Area */}
+            <div className="md:col-span-3 space-y-8 animate-in fade-in slide-in-from-right-4 duration-700 delay-300">
+              {/* Appearance Section */}
+              <section className="bg-card/50 backdrop-blur-xl border border-border/40 rounded-[2.5rem] p-8 sm:p-10 shadow-2xl">
+                <div className="flex items-center gap-3 mb-8">
+                  <Monitor className="text-primary" size={20} />
+                  <h2 className="text-xl font-bold text-foreground tracking-tight">Appearance</h2>
+                </div>
+
                 <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">Appearance</h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Customize the look and feel of the application.
-                    </p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="text-sm font-medium text-gray-900">Dark Mode</div>
-                        <div className="ml-2 text-sm text-gray-500" id="dark-mode-description">
-                          Toggle dark mode on/off
-                        </div>
+                  <div className="flex items-center justify-between p-6 bg-muted/30 rounded-[2rem] border border-border/40">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                        <Moon size={20} />
                       </div>
-                      <button
-                        onClick={() => setDarkMode(!darkMode)}
-                        type="button"
-                        className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${darkMode ? 'bg-blue-600' : 'bg-gray-200'
-                          }`}
-                        role="switch"
-                        aria-checked={darkMode}
-                      >
-                        <span
-                          aria-hidden="true"
-                          className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${darkMode ? 'translate-x-5' : 'translate-x-0'
-                            }`}
-                        />
-                      </button>
+                      <div>
+                        <p className="text-sm font-bold text-foreground">Theme Mode</p>
+                        <p className="text-[11px] text-muted-foreground">Force high-fidelity dark mode across the builder.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-primary/20 text-primary rounded-xl text-xs font-black tracking-widest uppercase">
+                      <Check size={14} strokeWidth={3} />
+                      Dark
                     </div>
                   </div>
                 </div>
+              </section>
 
-                {/* Notification Settings */}
-                <div className="pt-8 space-y-6">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">Notifications</h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Choose how you receive notifications.
-                    </p>
-                  </div>
+              {/* Notifications Section */}
+              <section className="bg-card/50 backdrop-blur-xl border border-border/40 rounded-[2.5rem] p-8 sm:p-10 shadow-2xl">
+                <div className="flex items-center gap-3 mb-8">
+                  <Bell className="text-primary" size={20} />
+                  <h2 className="text-xl font-bold text-foreground tracking-tight">Notification Channels</h2>
+                </div>
 
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="text-sm font-medium text-gray-900">Email</div>
-                        <div className="ml-2 text-sm text-gray-500" id="email-notifications-description">
-                          Receive notifications via email
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleNotificationChange('email')}
-                        type="button"
-                        className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${notifications.email ? 'bg-blue-600' : 'bg-gray-200'
-                          }`}
-                        role="switch"
-                        aria-checked={notifications.email}
+                <div className="space-y-4">
+                  <ToggleItem
+                    icon={<Mail size={18} />}
+                    title="Email Notifications"
+                    desc="Receive activity digests and security alerts."
+                    enabled={notifications.email}
+                    onToggle={() => toggleNotification('email')}
+                  />
+                  <ToggleItem
+                    icon={<Monitor size={18} />}
+                    title="Push Alerts"
+                    desc="Real-time updates directly on your device."
+                    enabled={notifications.push}
+                    onToggle={() => toggleNotification('push')}
+                  />
+                  <ToggleItem
+                    icon={<MessageSquare size={18} />}
+                    title="SMS / Phone"
+                    desc="Critical infrastructure and downtime alerts."
+                    enabled={notifications.sms}
+                    onToggle={() => toggleNotification('sms')}
+                  />
+                </div>
+              </section>
+
+              {/* Language Section */}
+              <section className="bg-card/50 backdrop-blur-xl border border-border/40 rounded-[2.5rem] p-8 sm:p-10 shadow-2xl">
+                <div className="flex items-center gap-3 mb-8">
+                  <Globe className="text-primary" size={20} />
+                  <h2 className="text-xl font-bold text-foreground tracking-tight">Regional Settings</h2>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.2em] pl-1">Primary Language</label>
+                    <div className="relative group">
+                      <select
+                        value={language}
+                        onChange={(e) => setLanguage(e.target.value)}
+                        className="w-full bg-muted/30 border border-border/40 hover:border-border focus:border-primary rounded-2xl px-6 py-4 text-sm font-bold transition-all appearance-none focus:outline-none focus:ring-4 focus:ring-primary/5 cursor-pointer"
                       >
-                        <span
-                          aria-hidden="true"
-                          className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${notifications.email ? 'translate-x-5' : 'translate-x-0'
-                            }`}
-                        />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="text-sm font-medium text-gray-900">Push Notifications</div>
-                        <div className="ml-2 text-sm text-gray-500" id="push-notifications-description">
-                          Receive push notifications on your devices
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleNotificationChange('push')}
-                        type="button"
-                        className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${notifications.push ? 'bg-blue-600' : 'bg-gray-200'
-                          }`}
-                        role="switch"
-                        aria-checked={notifications.push}
-                      >
-                        <span
-                          aria-hidden="true"
-                          className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${notifications.push ? 'translate-x-5' : 'translate-x-0'
-                            }`}
-                        />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="text-sm font-medium text-gray-900">SMS</div>
-                        <div className="ml-2 text-sm text-gray-500" id="sms-notifications-description">
-                          Receive notifications via SMS
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleNotificationChange('sms')}
-                        type="button"
-                        className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${notifications.sms ? 'bg-blue-600' : 'bg-gray-200'
-                          }`}
-                        role="switch"
-                        aria-checked={notifications.sms}
-                      >
-                        <span
-                          aria-hidden="true"
-                          className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${notifications.sms ? 'translate-x-5' : 'translate-x-0'
-                            }`}
-                        />
-                      </button>
+                        <option value="en">English (United States)</option>
+                        <option value="es">Español (España)</option>
+                        <option value="ph">Tagalog (Philippines)</option>
+                        <option value="de">Deutsch (Germany)</option>
+                      </select>
+                      <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground rotate-90 pointer-events-none" size={16} />
                     </div>
                   </div>
                 </div>
+              </section>
 
-                {/* Language Settings */}
-                <div className="pt-8 space-y-6">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">Language</h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Select your preferred language for the application.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
-                    <div className="sm:col-span-3">
-                      <label htmlFor="language" className="block text-sm font-medium text-gray-700">
-                        Language
-                      </label>
-                      <div className="mt-1">
-                        <select
-                          id="language"
-                          name="language"
-                          value={language}
-                          onChange={(e) => setLanguage(e.target.value)}
-                          className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                        >
-                          <option value="en">English</option>
-                          <option value="es">Spanish</option>
-                          <option value="fr">French</option>
-                          <option value="de">German</option>
-                          <option value="zh">Chinese</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-8 flex justify-end">
-                  <button
-                    type="button"
-                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Save Changes
-                  </button>
-                </div>
+              <div className="pt-4 flex justify-end gap-4">
+                <button className="px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-bold shadow-2xl shadow-primary/30 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all text-sm">
+                  Save All Changes
+                </button>
               </div>
             </div>
           </div>
@@ -202,3 +139,36 @@ export const SettingsPage: React.FC = () => {
     </MainLayout>
   );
 };
+
+const NavButton = ({ icon, label, active = false }: { icon: any, label: string, active?: boolean }) => (
+  <button className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${active
+    ? 'bg-primary/10 border-primary/20 text-primary shadow-lg shadow-primary/5'
+    : 'bg-transparent border-transparent text-muted-foreground hover:bg-muted/30 hover:text-foreground'}`}>
+    <div className="flex items-center gap-3 text-sm font-bold">
+      {icon}
+      {label}
+    </div>
+    {active && <div className="w-1.5 h-1.5 bg-primary rounded-full" />}
+  </button>
+);
+
+const ToggleItem = ({ icon, title, desc, enabled, onToggle }: { icon: any, title: string, desc: string, enabled: boolean, onToggle: () => void }) => (
+  <div className="flex items-center justify-between p-6 bg-muted/20 rounded-[2rem] border border-border/20 group hover:border-border/40 transition-colors">
+    <div className="flex items-center gap-5">
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${enabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+        {icon}
+      </div>
+      <div>
+        <h4 className="text-sm font-bold text-foreground">{title}</h4>
+        <p className="text-[11px] text-muted-foreground leading-tight">{desc}</p>
+      </div>
+    </div>
+
+    <button
+      onClick={onToggle}
+      className={`w-14 h-8 rounded-full relative transition-all duration-300 ${enabled ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-muted-foreground/30'}`}
+    >
+      <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-300 shadow-md ${enabled ? 'translate-x-6' : 'translate-x-0'}`} />
+    </button>
+  </div>
+);

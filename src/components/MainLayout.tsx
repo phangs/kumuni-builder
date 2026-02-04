@@ -24,7 +24,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   const navigate = useNavigate();
 
   return (
-    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden selection:bg-primary/20 selection:text-primary">
+    <div className="dark h-screen flex flex-col bg-background text-foreground overflow-hidden selection:bg-primary/20 selection:text-primary">
       {/* Top toolbar */}
       <div className="bg-card/80 backdrop-blur-md border-b border-border/50 px-6 py-3 flex justify-between items-center z-50 shadow-sm relative">
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
