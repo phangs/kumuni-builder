@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { 
-  SDUIComponent, 
+import {
+  SDUIComponent,
   FormData
 } from '@/types/sdui';
 
@@ -82,16 +82,16 @@ const renderText = (
 ) => {
   const { text, style, ...otherProps } = component.props || {};
   const computedStyle = convertStyle(style, theme);
-  
+
   return (
     <div
       key={component.id}
       style={{
-        fontSize: 16,
-        fontWeight: 'normal',
-        color: '#000000',
+        fontSize: 15, // Aligned with sfProRegular15
+        fontWeight: '400',
+        color: '#1D1D1F', // Standard dark color from kumuni-expo
         textAlign: 'left',
-        lineHeight: 1.4,
+        lineHeight: 1.5,
         ...computedStyle
       }}
       {...otherProps}
@@ -110,17 +110,17 @@ const renderHeading = (
 ) => {
   const { text, style, ...otherProps } = component.props || {};
   const computedStyle = convertStyle(style, theme);
-  
+
   return (
     <h2
       key={component.id}
       style={{
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#000000',
+        fontSize: 22, // Aligned with sfProSemibold22
+        fontWeight: '600',
+        color: '#030213', // Brand primary color
         textAlign: 'left',
         lineHeight: 1.2,
-        margin: 0,
+        margin: '0 0 4px 0',
         ...computedStyle
       }}
       {...otherProps}
@@ -140,22 +140,25 @@ const renderButton = (
 ) => {
   const { title, variant = 'primary', ...otherProps } = component.props || {};
   const { colorScheme } = useTheme();
-  const primaryColor = theme?.primaryColor || colorScheme?.primary || '#030213';
-  const secondaryColor = theme?.secondaryColor || colorScheme?.secondary || '#468B97';
-  
+  // Ensure we use hardcoded brand colors as default to match mobile even in dark mode builder
+  const primaryColor = theme?.primaryColor || '#030213';
+  const secondaryColor = theme?.secondaryColor || '#468B97';
+
   // Determine button styles based on variant
   let buttonStyle: React.CSSProperties = {
-    borderRadius: 8,
+    borderRadius: 12, // More modern look matching newest UI
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     padding: '12px 16px',
     minWidth: 44,
-    minHeight: 44,
+    minHeight: 48, // Standard mobile button height
     borderWidth: 1,
     borderStyle: 'solid',
     cursor: 'pointer',
     display: 'flex',
+    transition: 'all 0.2s ease',
+    userSelect: 'none',
   };
 
   switch (variant) {
@@ -262,26 +265,28 @@ const renderTextInput = (
   const inputStyle: React.CSSProperties = {
     width: '100%',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB', // Lighter border matching kumuni-expo
+    borderRadius: 10,
+    padding: '10px 14px',
+    fontSize: 15,
+    backgroundColor: '#F9FAFB', // Slight off-white background
     outline: 'none',
+    boxSizing: 'border-box',
+    display: 'block',
   };
 
   return (
-    <div key={component.id} style={{ marginBottom: 16, width: '100%' }}>
+    <div key={component.id} style={{ marginBottom: 18, width: '100%' }}>
       {label && (
-        <div style={{ 
-          display: 'block', 
-          marginBottom: 8, 
-          fontSize: 14, 
+        <label style={{
+          display: 'block',
+          marginBottom: 6,
+          fontSize: 13,
           fontWeight: '600',
-          color: '#000000'
+          color: '#374151'
         }}>
           {label}
-        </div>
+        </label>
       )}
       <input
         style={inputStyle}
@@ -314,27 +319,29 @@ const renderTextarea = (
   const textareaStyle: React.CSSProperties = {
     width: '100%',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB',
+    borderRadius: 10,
+    padding: '10px 14px',
+    fontSize: 15,
+    backgroundColor: '#F9FAFB',
     outline: 'none',
     resize: 'vertical',
+    boxSizing: 'border-box',
+    display: 'block',
   };
 
   return (
-    <div key={component.id} style={{ marginBottom: 16, width: '100%' }}>
+    <div key={component.id} style={{ marginBottom: 18, width: '100%' }}>
       {label && (
-        <div style={{ 
-          display: 'block', 
-          marginBottom: 8, 
-          fontSize: 14, 
+        <label style={{
+          display: 'block',
+          marginBottom: 6,
+          fontSize: 13,
           fontWeight: '600',
-          color: '#000000'
+          color: '#374151'
         }}>
           {label}
-        </div>
+        </label>
       )}
       <textarea
         style={textareaStyle}
@@ -367,26 +374,28 @@ const renderDatePicker = (
   const inputStyle: React.CSSProperties = {
     width: '100%',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB',
+    borderRadius: 10,
+    padding: '10px 14px',
+    fontSize: 15,
+    backgroundColor: '#F9FAFB',
     outline: 'none',
+    boxSizing: 'border-box',
+    display: 'block',
   };
 
   return (
-    <div key={component.id} style={{ marginBottom: 16, width: '100%' }}>
+    <div key={component.id} style={{ marginBottom: 18, width: '100%' }}>
       {label && (
-        <div style={{ 
-          display: 'block', 
-          marginBottom: 8, 
-          fontSize: 14, 
+        <label style={{
+          display: 'block',
+          marginBottom: 6,
+          fontSize: 13,
           fontWeight: '600',
-          color: '#000000'
+          color: '#374151'
         }}>
           {label}
-        </div>
+        </label>
       )}
       <input
         style={inputStyle}
@@ -423,7 +432,7 @@ const renderImage = (
         width: '100%',
         height: 200,
         objectFit: 'cover',
-        borderRadius: 8,
+        borderRadius: 12, // More modern radius matching brand spec
         margin: 0,
         padding: 0,
         ...computedStyle
@@ -440,7 +449,7 @@ const renderSpacer = (
   component: SDUIComponent
 ) => {
   const { size = 16, ...otherProps } = component.props || {};
-  
+
   return (
     <div
       key={component.id}
@@ -527,10 +536,10 @@ export const SduiPage: React.FC<SduiPageProps> = ({ schema, currentPageId, onAct
     );
   }
 
-  // Get theme colors (fallback to app theme)
+  // Get theme colors (fallback to brand colors)
   const theme = {
-    primaryColor: '#030213',
-    secondaryColor: '#468B97',
+    primaryColor: colorScheme.primary,
+    secondaryColor: colorScheme.secondary,
   };
 
   const handleFormDataChange = (name: string, value: any) => {
@@ -543,9 +552,11 @@ export const SduiPage: React.FC<SduiPageProps> = ({ schema, currentPageId, onAct
   return (
     <div
       style={{
-        minHeight: '100vh',
-        padding: 16,
-        backgroundColor: '#FFFFFF',
+        minHeight: '100%',
+        padding: 20, // Standard mobile padding
+        backgroundColor: (currentPage as any).backgroundColor || '#FFFFFF',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       {currentPage.components.map((component, index) => {
@@ -555,15 +566,15 @@ export const SduiPage: React.FC<SduiPageProps> = ({ schema, currentPageId, onAct
 
         // For images, we want them to span full width, so we'll handle them differently
         if (isImage) {
-          // For images, we need to span full width, so we'll remove horizontal padding effects
+          // For images, we need to span full width and touch the edges
           return (
             <div
               key={component.id}
               style={{
-                marginLeft: '-16px',  // Compensate for parent padding
-                marginRight: '-16px', // Compensate for parent padding
-                paddingLeft: '16px',   // Add padding inside
-                paddingRight: '16px',  // Add padding inside
+                marginLeft: '-20px',  // Compensate for parent padding to touch left edge
+                marginRight: '-20px', // Compensate for parent padding to touch right edge
+                paddingLeft: '20px',   // Restore inner padding
+                paddingRight: '20px',  // Restore inner padding
                 marginBottom: marginBottom
               }}
             >

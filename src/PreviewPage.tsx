@@ -133,46 +133,78 @@ const PreviewPage: React.FC = () => {
 
   if (!schema) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading preview...</p>
+      <div className="flex items-center justify-center h-screen bg-background relative overflow-hidden">
+        {/* Dynamic Background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] animate-pulse" />
+        </div>
+
+        <div className="text-center relative z-10">
+          <div className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin mx-auto mb-6 shadow-lg shadow-primary/20" />
+          <p className="text-foreground font-bold tracking-widest uppercase text-[10px]">Synchronizing Environment...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-200 flex items-center justify-center p-4">
-      {/* Mobile frame */}
-      <div
-        className="bg-white border-4 border-gray-800 rounded-[40px] w-[360px] h-[700px] overflow-hidden flex flex-col"
-        style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}
-      >
-        {/* Mobile notch */}
-        <div className="bg-gray-800 h-6 w-32 mx-auto rounded-b-lg"></div>
+    <div className="min-h-screen bg-background flex items-center justify-center p-8 relative overflow-hidden">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[100px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[100px]" />
+        <div className="absolute inset-0 dot-pattern opacity-30" />
+      </div>
 
-        {/* Screen content - this is where the actual SDUI content renders */}
-        <div className="flex-1 overflow-auto bg-white">
-          {/* Ensure white background unless specifically set in the page, and override SduiPage's background */}
-          <div style={{
-            minHeight: '100%',
-            padding: 16,
-            backgroundColor: schema?.pages?.[0]?.backgroundColor || '#FFFFFF',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            <SduiPage
-              schema={{...schema}}
-              currentPageId={currentPageId}
-              onAction={handleAction}
-            />
+      <div className="relative z-10 flex flex-col items-center">
+        {/* Mobile device frame */}
+        <div
+          className="bg-[#0f1115] border-[12px] border-[#1a1c21] rounded-[3.5rem] w-[375px] h-[812px] overflow-hidden flex flex-col relative shadow-[0_0_80px_rgba(0,0,0,0.5)] ring-1 ring-white/10"
+        >
+          {/* Mobile hardware details */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-[#1a1c21] rounded-b-[1.5rem] z-20 flex items-center justify-center gap-4">
+            <div className="w-2 h-2 rounded-full bg-white/5" />
+            <div className="w-12 h-1 rounded-full bg-white/10" />
+          </div>
+
+          <div className="absolute top-2 left-10 text-[10px] font-bold text-white/40 z-20">9:41</div>
+          <div className="absolute top-2 right-10 flex gap-1 z-20">
+            <div className="w-3 h-3 rounded-full border border-white/20" />
+            <div className="w-3 h-3 rounded-full border border-white/20" />
+          </div>
+
+          {/* Screen content */}
+          <div className="flex-1 overflow-auto bg-white relative mt-1 mx-1 rounded-[2.8rem] overflow-hidden">
+            <div style={{
+              minHeight: '100%',
+              backgroundColor: schema?.pages?.find((p: any) => p.id === currentPageId)?.backgroundColor || '#FFFFFF',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <SduiPage
+                schema={{ ...schema }}
+                currentPageId={currentPageId}
+                onAction={handleAction}
+              />
+            </div>
+          </div>
+
+          {/* Home indicator */}
+          <div className="h-6 flex items-center justify-center">
+            <div className="w-24 h-1 bg-white/20 rounded-full" />
           </div>
         </div>
 
-        {/* Mobile home indicator */}
-        <div className="bg-gray-800 h-1 w-32 mx-auto rounded-full mb-2"></div>
+        {/* Back button or controls if needed */}
+        <div className="mt-12 flex gap-4">
+          <button
+            onClick={() => window.close()}
+            className="px-8 py-3 bg-card border border-border/60 text-foreground font-bold text-sm rounded-2xl hover:bg-muted transition-all shadow-xl"
+          >
+            Exit Preview
+          </button>
+        </div>
       </div>
     </div>
   );

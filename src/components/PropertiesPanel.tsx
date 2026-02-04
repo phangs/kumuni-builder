@@ -19,12 +19,14 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   if (!component) {
     if (!page) {
       return (
-        <div className="text-center text-gray-500 py-8">
-          Select a page or component to edit its properties
+        <div className="flex flex-col items-center justify-center py-20 px-8 text-center bg-muted/10 rounded-2xl border border-dashed border-border/40">
+          <p className="text-sm font-medium text-muted-foreground leading-relaxed">
+            Select a component on the canvas or a page from the sidebar to edit its properties.
+          </p>
         </div>
       );
     }
-    
+
     // Page properties editing
     const handlePageChange = (property: string, value: any) => {
       const updatedPage = {
@@ -35,42 +37,57 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     };
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 animate-in fade-in slide-in-from-right-2 duration-300">
         <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-2">Page Properties</h3>
+          <SectionHeader title="Page Configuration" />
         </div>
 
-        <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-2">Page ID</h3>
+        <InputGroup label="Unique ID" description="The identifier used for navigation and deep linking.">
           <input
             type="text"
             value={page.id || ''}
             onChange={(e) => handlePageChange('id', e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded text-sm"
-            placeholder="Page ID"
+            className="styled-input"
+            placeholder="e.g. home-page"
           />
-        </div>
+        </InputGroup>
 
-        <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-2">Page Title</h3>
+        <InputGroup label="Page Title" description="External name displayed in navigation.">
           <input
             type="text"
             value={page.title || ''}
             onChange={(e) => handlePageChange('title', e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded text-sm"
-            placeholder="Page Title"
+            className="styled-input"
+            placeholder="e.g. Dashboard"
           />
-        </div>
+        </InputGroup>
 
-        <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-2">Page Order</h3>
+        <InputGroup label="Order Index">
           <input
             type="number"
             value={page.order || 0}
             onChange={(e) => handlePageChange('order', parseInt(e.target.value))}
-            className="w-full p-2 border border-gray-300 rounded text-sm"
+            className="styled-input"
           />
-        </div>
+        </InputGroup>
+
+        <InputGroup label="Background Color">
+          <div className="flex gap-3">
+            <input
+              type="color"
+              value={page.backgroundColor || '#FFFFFF'}
+              onChange={(e) => handlePageChange('backgroundColor', e.target.value)}
+              className="w-12 h-10 bg-muted/40 border border-border/60 rounded-xl cursor-pointer p-1"
+            />
+            <input
+              type="text"
+              value={page.backgroundColor || '#FFFFFF'}
+              onChange={(e) => handlePageChange('backgroundColor', e.target.value)}
+              className="styled-input flex-1 font-mono uppercase"
+              placeholder="#FFFFFF"
+            />
+          </div>
+        </InputGroup>
       </div>
     );
   }
@@ -112,80 +129,67 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Component Type</h3>
-        <div className="text-sm bg-gray-100 px-3 py-2 rounded">
-          {component.type}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-2">ID</h3>
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-2 duration-300">
+      <InputGroup label="Component ID" description="Unique within this page.">
         <input
           type="text"
           value={component.id || ''}
           onChange={(e) => handleChange('id', e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded text-sm"
-          placeholder="Component ID"
+          className="styled-input font-mono"
+          placeholder="component-id"
         />
-      </div>
+      </InputGroup>
 
       {component.type === 'text' && (
-        <>
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Text Content</h3>
-            <textarea
-              value={component.props?.text || ''}
-              onChange={(e) => handlePropsChange('text', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
-              rows={3}
-            />
-          </div>
-        </>
+        <InputGroup label="Text Content" description="The actual text to be displayed.">
+          <textarea
+            value={component.props?.text || ''}
+            onChange={(e) => handlePropsChange('text', e.target.value)}
+            className="styled-input min-h-[100px]"
+            rows={4}
+          />
+        </InputGroup>
       )}
 
       {component.type === 'heading' && (
-        <>
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Heading Text</h3>
-            <textarea
-              value={component.props?.text || ''}
-              onChange={(e) => handlePropsChange('text', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
-              rows={2}
-            />
-          </div>
-        </>
+        <InputGroup label="Heading Text" description="Display text for this heading component.">
+          <textarea
+            value={component.props?.text || ''}
+            onChange={(e) => handlePropsChange('text', e.target.value)}
+            className="styled-input"
+            rows={2}
+          />
+        </InputGroup>
       )}
 
       {component.type === 'button' && (
         <>
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Button Title</h3>
+          <SectionHeader title="Button Properties" />
+
+          <InputGroup label="Button Title" description="The text label shown on the button.">
             <input
               type="text"
               value={component.props?.title || ''}
               onChange={(e) => handlePropsChange('title', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
+              className="styled-input"
             />
-          </div>
+          </InputGroup>
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Variant</h3>
+          <InputGroup label="Visual Style">
             <select
               value={component.props?.variant || 'primary'}
               onChange={(e) => handlePropsChange('variant', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
+              className="styled-input appearance-none bg-muted/40"
             >
-              <option value="primary">Primary</option>
-              <option value="secondary">Secondary</option>
-              <option value="outline">Outline</option>
+              <option value="primary">Primary (Filled)</option>
+              <option value="secondary">Secondary (Muted)</option>
+              <option value="outline">Outline (Ghost)</option>
             </select>
-          </div>
+          </InputGroup>
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Action Type</h3>
+          <SectionHeader title="Interaction Action" />
+
+          <InputGroup label="On Click Action" description="What happens when the user clicks this button?">
             <select
               value={component.action?.type || ''}
               onChange={(e) => {
@@ -195,7 +199,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 };
                 handleChange('action', updatedAction);
               }}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
+              className="styled-input appearance-none bg-muted/40"
             >
               <option value="">No Action</option>
               <option value="@pushPage">Navigate to Page</option>
@@ -204,11 +208,10 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               <option value="@toast">Show Toast</option>
               <option value="@register">Register</option>
             </select>
-          </div>
+          </InputGroup>
 
           {component.action?.type === '@pushPage' && (
-            <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Target Page ID</h3>
+            <InputGroup label="Target Page" description="Choose which page to navigate to.">
               <select
                 value={component.action?.params?.pageId || ''}
                 onChange={(e) => {
@@ -221,21 +224,20 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                   };
                   handleChange('action', updatedAction);
                 }}
-                className="w-full p-2 border border-gray-300 rounded text-sm"
+                className="styled-input appearance-none bg-muted/40"
               >
-                <option value="">Select a page</option>
+                <option value="">Select a page...</option>
                 {allPages && allPages.map((page) => (
                   <option key={page.id} value={page.id}>
                     {page.title || page.id}
                   </option>
                 ))}
               </select>
-            </div>
+            </InputGroup>
           )}
 
           {component.action?.type === '@toast' && (
-            <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Toast Message</h3>
+            <InputGroup label="Toast Message" description="The feedback message shown to the user.">
               <input
                 type="text"
                 value={component.action?.params?.message || ''}
@@ -249,91 +251,79 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                   };
                   handleChange('action', updatedAction);
                 }}
-                className="w-full p-2 border border-gray-300 rounded text-sm"
-                placeholder="Message to display"
+                className="styled-input"
+                placeholder="e.g. Action successful!"
               />
-            </div>
+            </InputGroup>
           )}
         </>
       )}
 
       {component.type === 'text-input' && (
         <>
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Label</h3>
+          <SectionHeader title="Input Field Properties" />
+
+          <InputGroup label="Field Label">
             <input
               type="text"
               value={component.props?.label || ''}
               onChange={(e) => handlePropsChange('label', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
+              className="styled-input"
+              placeholder="e.g. Full Name"
             />
-          </div>
+          </InputGroup>
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Placeholder</h3>
+          <InputGroup label="Placeholder" description="Temporary text shown before the user types.">
             <input
               type="text"
               value={component.props?.placeholder || ''}
               onChange={(e) => handlePropsChange('placeholder', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
+              className="styled-input"
+              placeholder="e.g. Juan Dela Cruz"
             />
+          </InputGroup>
+
+          <div className="grid grid-cols-2 gap-4">
+            <InputGroup label="Keyboard Type">
+              <select
+                value={component.props?.keyboardType || 'default'}
+                onChange={(e) => handlePropsChange('keyboardType', e.target.value)}
+                className="styled-input appearance-none bg-muted/40"
+              >
+                <option value="default">Default</option>
+                <option value="email-address">Email</option>
+                <option value="numeric">Numeric</option>
+                <option value="phone-pad">Phone</option>
+              </select>
+            </InputGroup>
+
+            <InputGroup label="Auto Capitalize">
+              <select
+                value={component.props?.autoCapitalize || 'off'}
+                onChange={(e) => handlePropsChange('autoCapitalize', e.target.value)}
+                className="styled-input appearance-none bg-muted/40"
+              >
+                <option value="off">Off</option>
+                <option value="none">None</option>
+                <option value="words">Words</option>
+                <option value="sentences">Sentences</option>
+                <option value="characters">Characters</option>
+              </select>
+            </InputGroup>
           </div>
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Keyboard Type</h3>
-            <select
-              value={component.props?.keyboardType || 'default'}
-              onChange={(e) => handlePropsChange('keyboardType', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
-            >
-              <option value="default">Default</option>
-              <option value="email-address">Email</option>
-              <option value="numeric">Numeric</option>
-              <option value="phone-pad">Phone</option>
-            </select>
-          </div>
+          <div className="pt-4 mt-4 border-t border-border/40">
+            <SectionHeader title="Validation Rules" />
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Auto Capitalize</h3>
-            <select
-              value={component.props?.autoCapitalize || 'off'}
-              onChange={(e) => handlePropsChange('autoCapitalize', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
-            >
-              <option value="off">Off</option>
-              <option value="none">None</option>
-              <option value="words">Words</option>
-              <option value="sentences">Sentences</option>
-              <option value="characters">Characters</option>
-            </select>
-          </div>
-
-          {/* Validation Properties */}
-          <div className="pt-4 border-t border-gray-200">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Validation</h3>
-
-            <div className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                id="textInputRequired"
-                checked={component.validation?.required || false}
-                onChange={(e) => {
-                  const updatedValidation = {
-                    ...(component.validation || {}),
-                    required: e.target.checked
-                  };
-                  handleChange('validation', updatedValidation);
-                }}
-                className="h-4 w-4 text-blue-600 rounded"
-              />
-              <label htmlFor="textInputRequired" className="ml-2 block text-sm text-gray-700">
-                Required
-              </label>
+            <div className="flex items-center gap-3 p-3 bg-muted/20 rounded-xl border border-border/40 mb-4 cursor-pointer" onClick={() => handleChange('validation', { ...(component.validation || {}), required: !(component.validation?.required) })}>
+              <div className={`w-5 h-5 rounded border transition-colors flex items-center justify-center ${component.validation?.required ? 'bg-primary border-primary' : 'bg-transparent border-border'}`}>
+                {component.validation?.required && <div className="w-2 h-2 bg-white rounded-full" />}
+              </div>
+              <span className="text-sm font-medium text-foreground">Mark as Required</span>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-xs font-medium text-gray-500 mb-1">Min Length</h4>
+              <InputGroup label="Min Characters">
                 <input
                   type="number"
                   value={component.validation?.minLength || ''}
@@ -344,13 +334,12 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     };
                     handleChange('validation', updatedValidation);
                   }}
-                  className="w-full p-1 border border-gray-300 rounded text-xs"
-                  placeholder="Min length"
+                  className="styled-input py-2"
+                  placeholder="0"
                 />
-              </div>
+              </InputGroup>
 
-              <div>
-                <h4 className="text-xs font-medium text-gray-500 mb-1">Max Length</h4>
+              <InputGroup label="Max Characters">
                 <input
                   type="number"
                   value={component.validation?.maxLength || ''}
@@ -361,10 +350,10 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     };
                     handleChange('validation', updatedValidation);
                   }}
-                  className="w-full p-1 border border-gray-300 rounded text-xs"
-                  placeholder="Max length"
+                  className="styled-input py-2"
+                  placeholder="255"
                 />
-              </div>
+              </InputGroup>
             </div>
           </div>
         </>
@@ -372,77 +361,47 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
       {component.type === 'textarea' && (
         <>
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Label</h3>
+          <SectionHeader title="Text Area Properties" />
+
+          <InputGroup label="Field Label">
             <input
               type="text"
               value={component.props?.label || ''}
               onChange={(e) => handlePropsChange('label', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
+              className="styled-input"
             />
-          </div>
+          </InputGroup>
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Placeholder</h3>
+          <InputGroup label="Placeholder Text">
             <input
               type="text"
               value={component.props?.placeholder || ''}
               onChange={(e) => handlePropsChange('placeholder', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
+              className="styled-input"
             />
-          </div>
+          </InputGroup>
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Rows</h3>
+          <InputGroup label="Visual Rows" description="Initial height of the text area.">
             <input
               type="number"
               value={component.props?.rows || 3}
               onChange={(e) => handlePropsChange('rows', parseInt(e.target.value))}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
+              className="styled-input"
             />
-          </div>
+          </InputGroup>
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Auto Capitalize</h3>
-            <select
-              value={component.props?.autoCapitalize || 'sentences'}
-              onChange={(e) => handlePropsChange('autoCapitalize', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
-            >
-              <option value="off">Off</option>
-              <option value="none">None</option>
-              <option value="words">Words</option>
-              <option value="sentences">Sentences</option>
-              <option value="characters">Characters</option>
-            </select>
-          </div>
+          <div className="pt-4 mt-4 border-t border-border/40">
+            <SectionHeader title="Validation Rules" />
 
-          {/* Validation Properties */}
-          <div className="pt-4 border-t border-gray-200">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Validation</h3>
-
-            <div className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                id="textareaRequired"
-                checked={component.validation?.required || false}
-                onChange={(e) => {
-                  const updatedValidation = {
-                    ...(component.validation || {}),
-                    required: e.target.checked
-                  };
-                  handleChange('validation', updatedValidation);
-                }}
-                className="h-4 w-4 text-blue-600 rounded"
-              />
-              <label htmlFor="textareaRequired" className="ml-2 block text-sm text-gray-700">
-                Required
-              </label>
+            <div className="flex items-center gap-3 p-3 bg-muted/20 rounded-xl border border-border/40 mb-4 cursor-pointer" onClick={() => handleChange('validation', { ...(component.validation || {}), required: !(component.validation?.required) })}>
+              <div className={`w-5 h-5 rounded border transition-colors flex items-center justify-center ${component.validation?.required ? 'bg-primary border-primary' : 'bg-transparent border-border'}`}>
+                {component.validation?.required && <div className="w-2 h-2 bg-white rounded-full" />}
+              </div>
+              <span className="text-sm font-medium text-foreground">Mark as Required</span>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-xs font-medium text-gray-500 mb-1">Min Length</h4>
+              <InputGroup label="Min Characters">
                 <input
                   type="number"
                   value={component.validation?.minLength || ''}
@@ -453,13 +412,11 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     };
                     handleChange('validation', updatedValidation);
                   }}
-                  className="w-full p-1 border border-gray-300 rounded text-xs"
-                  placeholder="Min length"
+                  className="styled-input py-2"
                 />
-              </div>
+              </InputGroup>
 
-              <div>
-                <h4 className="text-xs font-medium text-gray-500 mb-1">Max Length</h4>
+              <InputGroup label="Max Characters">
                 <input
                   type="number"
                   value={component.validation?.maxLength || ''}
@@ -470,10 +427,9 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     };
                     handleChange('validation', updatedValidation);
                   }}
-                  className="w-full p-1 border border-gray-300 rounded text-xs"
-                  placeholder="Max length"
+                  className="styled-input py-2"
                 />
-              </div>
+              </InputGroup>
             </div>
           </div>
         </>
@@ -481,53 +437,38 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
       {component.type === 'date-picker' && (
         <>
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Label</h3>
+          <SectionHeader title="Date Picker Properties" />
+
+          <InputGroup label="Field Label">
             <input
               type="text"
               value={component.props?.label || ''}
               onChange={(e) => handlePropsChange('label', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
+              className="styled-input"
             />
-          </div>
+          </InputGroup>
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Placeholder</h3>
+          <InputGroup label="Placeholder Text">
             <input
               type="text"
               value={component.props?.placeholder || ''}
               onChange={(e) => handlePropsChange('placeholder', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
-              placeholder="Select date"
+              className="styled-input"
             />
-          </div>
+          </InputGroup>
 
-          {/* Validation Properties */}
-          <div className="pt-4 border-t border-gray-200">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Validation</h3>
+          <div className="pt-4 mt-4 border-t border-border/40">
+            <SectionHeader title="Date Range Constraints" />
 
-            <div className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                id="datePickerRequired"
-                checked={component.validation?.required || false}
-                onChange={(e) => {
-                  const updatedValidation = {
-                    ...(component.validation || {}),
-                    required: e.target.checked
-                  };
-                  handleChange('validation', updatedValidation);
-                }}
-                className="h-4 w-4 text-blue-600 rounded"
-              />
-              <label htmlFor="datePickerRequired" className="ml-2 block text-sm text-gray-700">
-                Required
-              </label>
+            <div className="flex items-center gap-3 p-3 bg-muted/20 rounded-xl border border-border/40 mb-4 cursor-pointer" onClick={() => handleChange('validation', { ...(component.validation || {}), required: !(component.validation?.required) })}>
+              <div className={`w-5 h-5 rounded border transition-colors flex items-center justify-center ${component.validation?.required ? 'bg-primary border-primary' : 'bg-transparent border-border'}`}>
+                {component.validation?.required && <div className="w-2 h-2 bg-white rounded-full" />}
+              </div>
+              <span className="text-sm font-medium text-foreground">Mark as Required</span>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-xs font-medium text-gray-500 mb-1">Min Date</h4>
+              <InputGroup label="Min Date">
                 <input
                   type="date"
                   value={component.validation?.min || ''}
@@ -538,13 +479,11 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     };
                     handleChange('validation', updatedValidation);
                   }}
-                  className="w-full p-1 border border-gray-300 rounded text-xs"
-                  placeholder="YYYY-MM-DD"
+                  className="styled-input py-2 text-xs"
                 />
-              </div>
+              </InputGroup>
 
-              <div>
-                <h4 className="text-xs font-medium text-gray-500 mb-1">Max Date</h4>
+              <InputGroup label="Max Date">
                 <input
                   type="date"
                   value={component.validation?.max || ''}
@@ -555,112 +494,127 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     };
                     handleChange('validation', updatedValidation);
                   }}
-                  className="w-full p-1 border border-gray-300 rounded text-xs"
-                  placeholder="YYYY-MM-DD"
+                  className="styled-input py-2 text-xs"
                 />
-              </div>
+              </InputGroup>
             </div>
           </div>
         </>
       )}
 
       {component.type === 'image' && (
-        <>
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Image Source</h3>
-            <input
-              type="text"
-              value={component.props?.source || ''}
-              onChange={(e) => handlePropsChange('source', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
-              placeholder="Image URL"
-            />
-          </div>
-        </>
+        <InputGroup label="Image Source (URL)" description="Provide a direct link to the image you want to display.">
+          <input
+            type="text"
+            value={component.props?.source || ''}
+            onChange={(e) => handlePropsChange('source', e.target.value)}
+            className="styled-input"
+            placeholder="https://example.com/image.jpg"
+          />
+        </InputGroup>
       )}
 
       {component.type === 'spacer' && (
-        <>
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Size</h3>
-            <input
-              type="number"
-              value={component.props?.size || 16}
-              onChange={(e) => handlePropsChange('size', parseInt(e.target.value))}
-              className="w-full p-2 border border-gray-300 rounded text-sm"
-            />
-          </div>
-        </>
+        <InputGroup label="Vertical Offset" description="Add empty space between components (in pixels).">
+          <input
+            type="number"
+            value={component.props?.size || 16}
+            onChange={(e) => handlePropsChange('size', parseInt(e.target.value))}
+            className="styled-input"
+          />
+        </InputGroup>
       )}
 
       {/* Common style properties */}
-      <div className="pt-4 border-t border-gray-200">
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Styling</h3>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <h4 className="text-xs font-medium text-gray-500 mb-1">Margin Top</h4>
+      <div className="pt-6 mt-6 border-t border-border/40">
+        <SectionHeader title="Visual Styles" />
+
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+          <InputGroup label="Margin Top">
             <input
               type="number"
               value={component.props?.style?.marginTop || ''}
               onChange={(e) => handleStyleChange('marginTop', parseInt(e.target.value))}
-              className="w-full p-1 border border-gray-300 rounded text-xs"
+              className="styled-input py-2 text-xs"
+              placeholder="0"
             />
-          </div>
-          
-          <div>
-            <h4 className="text-xs font-medium text-gray-500 mb-1">Margin Bottom</h4>
+          </InputGroup>
+
+          <InputGroup label="Margin Bottom">
             <input
               type="number"
               value={component.props?.style?.marginBottom || ''}
               onChange={(e) => handleStyleChange('marginBottom', parseInt(e.target.value))}
-              className="w-full p-1 border border-gray-300 rounded text-xs"
+              className="styled-input py-2 text-xs"
+              placeholder="0"
             />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4 mt-2">
-          <div>
-            <h4 className="text-xs font-medium text-gray-500 mb-1">Padding Top</h4>
+          </InputGroup>
+
+          <InputGroup label="Padding Top">
             <input
               type="number"
               value={component.props?.style?.paddingTop || ''}
               onChange={(e) => handleStyleChange('paddingTop', parseInt(e.target.value))}
-              className="w-full p-1 border border-gray-300 rounded text-xs"
+              className="styled-input py-2 text-xs"
+              placeholder="0"
             />
-          </div>
-          
-          <div>
-            <h4 className="text-xs font-medium text-gray-500 mb-1">Padding Bottom</h4>
+          </InputGroup>
+
+          <InputGroup label="Padding Bottom">
             <input
               type="number"
               value={component.props?.style?.paddingBottom || ''}
               onChange={(e) => handleStyleChange('paddingBottom', parseInt(e.target.value))}
-              className="w-full p-1 border border-gray-300 rounded text-xs"
+              className="styled-input py-2 text-xs"
+              placeholder="0"
             />
-          </div>
+          </InputGroup>
         </div>
-        
-        <div className="mt-2">
-          <h4 className="text-xs font-medium text-gray-500 mb-1">Background Color</h4>
-          <input
-            type="color"
-            value={component.props?.style?.backgroundColor || ''}
-            onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
-            className="w-full h-8 border border-gray-300 rounded"
-          />
-        </div>
-        
-        <div className="mt-2">
-          <h4 className="text-xs font-medium text-gray-500 mb-1">Border Radius</h4>
-          <input
-            type="number"
-            value={component.props?.style?.borderRadius || ''}
-            onChange={(e) => handleStyleChange('borderRadius', parseInt(e.target.value))}
-            className="w-full p-1 border border-gray-300 rounded text-xs"
-          />
+
+        <div className="grid grid-cols-1 gap-4 mt-2">
+          <InputGroup label="Background Overlay">
+            <div className="flex gap-3">
+              <input
+                type="color"
+                value={component.props?.style?.backgroundColor || '#000000'}
+                onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
+                className="w-12 h-10 bg-muted/40 border border-border/60 rounded-xl cursor-pointer p-1"
+              />
+              <input
+                type="text"
+                value={component.props?.style?.backgroundColor || ''}
+                onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
+                className="styled-input flex-1 font-mono uppercase"
+                placeholder="#HEXCODE"
+              />
+            </div>
+          </InputGroup>
+
+          <InputGroup label="Corner Radius">
+            <input
+              type="number"
+              value={component.props?.style?.borderRadius || ''}
+              onChange={(e) => handleStyleChange('borderRadius', parseInt(e.target.value))}
+              className="styled-input"
+              placeholder="0"
+            />
+          </InputGroup>
         </div>
       </div>
     </div>
   );
 };
+
+const SectionHeader = ({ title }: { title: string }) => (
+  <div className="flex items-center gap-2 border-b border-border/40 pb-2 mb-4">
+    <h3 className="text-[11px] font-bold text-foreground uppercase tracking-widest leading-none">{title}</h3>
+  </div>
+);
+
+const InputGroup = ({ label, description, children }: { label: string, description?: string, children: any }) => (
+  <div className="space-y-1.5 mb-4">
+    <label className="text-[11px] font-bold text-foreground/60 uppercase tracking-widest px-1">{label}</label>
+    {children}
+    {description && <p className="text-[10px] text-muted-foreground px-1 opacity-70 leading-tight">{description}</p>}
+  </div>
+);
