@@ -36,7 +36,6 @@ function App() {
     is_published: false,
     published_at: null,
     navigation: {
-      guestPageId: "welcome",
       initialPageId: "welcome"
     },
     pages: [

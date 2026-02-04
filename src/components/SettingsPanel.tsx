@@ -13,7 +13,6 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ schema, onUpdateSc
     version: schema.version || '1.0.0',
     description: schema.description || '',
     slug: schema.slug || '',
-    isPublic: schema.is_public || false,
     permissions: schema.permissions ? [...schema.permissions] : [],
     statuses: schema.statuses ? [...schema.statuses] : [],
   });
@@ -36,7 +35,6 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ schema, onUpdateSc
       version: settings.version,
       description: settings.description,
       slug: settings.slug,
-      is_public: settings.isPublic,
       permissions: settings.permissions,
       statuses: settings.statuses,
     };
@@ -133,19 +131,6 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ schema, onUpdateSc
               placeholder="Tell us what this app does..."
             />
           </InputGroup>
-
-          <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-2xl border border-border/40 group cursor-pointer" onClick={() => handleInputChange('isPublic', !settings.isPublic)}>
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${settings.isPublic ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
-              {settings.isPublic ? <Globe size={18} /> : <Lock size={18} />}
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-bold text-foreground">Public Availability</p>
-              <p className="text-[11px] text-muted-foreground leading-tight">Whether this application is visible to all users.</p>
-            </div>
-            <div className={`w-11 h-6 rounded-full relative transition-colors ${settings.isPublic ? 'bg-primary' : 'bg-muted-foreground/30'}`}>
-              <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${settings.isPublic ? 'translate-x-5' : 'translate-x-0'}`} />
-            </div>
-          </div>
         </div>
       </div>
 

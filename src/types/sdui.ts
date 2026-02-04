@@ -41,7 +41,6 @@ export interface SDUISchema {
   is_published: boolean;
   published_at: string | null;
   navigation: {
-    guestPageId: string;
     initialPageId: string;
   };
   pages: PageComponent[];

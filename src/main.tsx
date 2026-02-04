@@ -8,6 +8,7 @@ import { RegisterPage } from './components/RegisterPage';
 import { MyAppsPage } from './components/MyAppsPage';
 import { ProfilePage } from './components/ProfilePage';
 import { SettingsPage } from './components/SettingsPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -23,11 +24,14 @@ const AppWrapper: React.FC = () => {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/" element={<Navigate to="/my-apps" replace />} />
-              <Route path="/builder" element={<App />} />
-              <Route path="/preview" element={<PreviewPage />} />
-              <Route path="/my-apps" element={<MyAppsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+
+              {/* Protected Routes */}
+              <Route path="/builder" element={<ProtectedRoute><App /></ProtectedRoute>} />
+              <Route path="/preview" element={<ProtectedRoute><PreviewPage /></ProtectedRoute>} />
+              <Route path="/my-apps" element={<ProtectedRoute><MyAppsPage /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+
               <Route path="*" element={<Navigate to="/my-apps" replace />} />
             </Routes>
           </BrowserRouter>
