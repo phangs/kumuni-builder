@@ -41,12 +41,14 @@ describe('JsonPreviewPane', () => {
         <JsonPreviewPane
           schema={mockSchema}
           selectedComponentId={null}
+          isOpen={true}
+          onOpenChange={jest.fn()}
         />
       </ToastProvider>
     );
 
-    // Check that the collapsible header is present
-    expect(screen.getByText('Live JSON Preview')).toBeInTheDocument();
+    // Check that the collapsible header is present (updated text to match component)
+    expect(screen.getByText('Live Schema JSON')).toBeInTheDocument();
 
     // Check that the JSON content is rendered
     const jsonContent = screen.getByText(/test-app/);
@@ -59,6 +61,8 @@ describe('JsonPreviewPane', () => {
         <JsonPreviewPane
           schema={mockSchema}
           selectedComponentId={null}
+          isOpen={true}
+          onOpenChange={jest.fn()}
         />
       </ToastProvider>
     );
@@ -75,12 +79,14 @@ describe('JsonPreviewPane', () => {
         <JsonPreviewPane
           schema={mockSchema}
           selectedComponentId="comp1"
+          isOpen={true}
+          onOpenChange={jest.fn()}
         />
       </ToastProvider>
     );
 
     // Check that the collapsible header is present
-    expect(screen.getByText('Live JSON Preview')).toBeInTheDocument();
+    expect(screen.getByText('Live Schema JSON')).toBeInTheDocument();
   });
 
   it('handles empty schema', () => {
@@ -89,26 +95,31 @@ describe('JsonPreviewPane', () => {
         <JsonPreviewPane
           schema={{}}
           selectedComponentId={null}
+          isOpen={true}
+          onOpenChange={jest.fn()}
         />
       </ToastProvider>
     );
 
     // Should still render the header even with empty schema
-    expect(screen.getByText('Live JSON Preview')).toBeInTheDocument();
+    expect(screen.getByText('Live Schema JSON')).toBeInTheDocument();
   });
 
   it('collapses and expands properly', () => {
+    const onOpenChange = jest.fn();
     render(
       <ToastProvider>
         <JsonPreviewPane
           schema={mockSchema}
           selectedComponentId={null}
+          isOpen={true}
+          onOpenChange={onOpenChange}
         />
       </ToastProvider>
     );
 
     // Check that the header is present
-    const header = screen.getByText('Live JSON Preview');
+    const header = screen.getByText('Live Schema JSON');
     expect(header).toBeInTheDocument();
 
     // The JSON content should be visible (since it's initially open)
