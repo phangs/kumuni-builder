@@ -17,14 +17,18 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
 }) => {
   const { toast } = useToast();
   // Initialize with the initialPageId, or fallback to the first page in schema if initialPageId is empty
-  const [currentPage, setCurrentPage] = useState<string>(() => {
-    if (initialPageId) {
-      return initialPageId;
-    } else if (schema && schema.pages && schema.pages.length > 0) {
-      return schema.pages[0].id;
+  const [currentPage, setCurrentPage] = useState<string>('');
+
+  // Sync currentPage with initialPageId when modal opens or initialPageId changes
+  React.useEffect(() => {
+    if (isOpen) {
+      if (initialPageId) {
+        setCurrentPage(initialPageId);
+      } else if (schema && schema.pages && schema.pages.length > 0) {
+        setCurrentPage(schema.pages[0].id);
+      }
     }
-    return '';
-  });
+  }, [isOpen, initialPageId, schema]);
 
   if (!isOpen) {
     return null;

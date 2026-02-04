@@ -327,6 +327,10 @@ function App() {
           setPreviewSchema(canvasSchema);
           setPreviewCurrentPageId(currentPageId);
           setShowPreviewModal(true);
+
+          // Also set in sessionStorage for standalone PreviewPage if needed
+          sessionStorage.setItem('sdui-preview-schema', JSON.stringify(canvasSchema));
+          sessionStorage.setItem('sdui-preview-current-page-id', currentPageId);
         }}
         onExportClick={() => {
           // Export functionality - download the current schema as JSON
