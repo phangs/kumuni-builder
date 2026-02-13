@@ -7,8 +7,8 @@ export const ProfilePage: React.FC = () => {
   const { user, logout } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
+    fullName: user?.fullName || '',
+    company: user?.company || '',
     email: user?.email || '',
   });
 
@@ -36,7 +36,9 @@ export const ProfilePage: React.FC = () => {
     );
   }
 
-  const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+  const initials = user.fullName
+    ? user.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+    : user.email.charAt(0).toUpperCase();
 
   return (
     <MainLayout>
@@ -76,8 +78,8 @@ export const ProfilePage: React.FC = () => {
                   </button>
                 </div>
 
-                <h3 className="text-2xl font-bold text-foreground mb-1">{user.firstName} {user.lastName}</h3>
-                <p className="text-primary font-medium text-sm mb-6">{user.email}</p>
+                <h3 className="text-2xl font-bold text-foreground mb-1">{user.fullName}</h3>
+                <p className="text-primary font-medium text-sm mb-6">{user.company}</p>
 
                 <div className="w-full pt-6 border-t border-border/40 space-y-4">
                   <div className="flex items-center justify-between text-sm">
@@ -113,27 +115,26 @@ export const ProfilePage: React.FC = () => {
 
                 {isEditing ? (
                   <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest pl-1">First Name</label>
-                        <input
-                          type="text"
-                          name="firstName"
-                          value={formData.firstName}
-                          onChange={handleInputChange}
-                          className="w-full bg-muted/30 border border-border/40 hover:border-border focus:border-primary rounded-2xl px-5 py-3.5 text-sm font-medium transition-all focus:outline-none focus:ring-4 focus:ring-primary/5"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest pl-1">Last Name</label>
-                        <input
-                          type="text"
-                          name="lastName"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                          className="w-full bg-muted/30 border border-border/40 hover:border-border focus:border-primary rounded-2xl px-5 py-3.5 text-sm font-medium transition-all focus:outline-none focus:ring-4 focus:ring-primary/5"
-                        />
-                      </div>
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest pl-1">Full Name</label>
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleInputChange}
+                        className="w-full bg-muted/30 border border-border/40 hover:border-border focus:border-primary rounded-2xl px-5 py-3.5 text-sm font-medium transition-all focus:outline-none focus:ring-4 focus:ring-primary/5"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest pl-1">Company</label>
+                      <input
+                        type="text"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleInputChange}
+                        className="w-full bg-muted/30 border border-border/40 hover:border-border focus:border-primary rounded-2xl px-5 py-3.5 text-sm font-medium transition-all focus:outline-none focus:ring-4 focus:ring-primary/5"
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -168,9 +169,9 @@ export const ProfilePage: React.FC = () => {
                 ) : (
                   <div className="space-y-10">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-10 gap-x-12">
-                      <DetailItem icon={<User size={14} />} label="Full Name" value={`${user.firstName} ${user.lastName}`} />
+                      <DetailItem icon={<User size={14} />} label="Full Name" value={user.fullName} />
                       <DetailItem icon={<Mail size={14} />} label="Email Address" value={user.email} />
-                      <DetailItem icon={<Calendar size={14} />} label="Join Date" value={user.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'} />
+                      <DetailItem icon={<Calendar size={14} />} label="Company" value={user.company} />
                       <DetailItem icon={<Shield size={14} />} label="Security" value="Two-Factor Enabled" status="secure" />
                     </div>
 

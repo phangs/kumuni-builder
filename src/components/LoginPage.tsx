@@ -16,12 +16,22 @@ export const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const success = await login(email, password);
-      if (success) {
+      const result = await login(email, password);
+      if (result.success) {
         toast.success('Login successful!');
-        navigate('/my-apps');
+
+        // Redirect based on role
+        const role = result.user?.role;
+
+        switch (role) {
+          case 'Admin':
+            navigate('/admin/dashboard');
+            break;
+          default:
+            navigate('/my-apps');
+        }
       } else {
-        toast.error('Login failed. Please check your credentials.');
+        toast.error(result.message || 'Login failed. Please check your credentials.');
       }
     } catch (error) {
       toast.error('An error occurred during login.');

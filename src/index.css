@@ -103,4 +103,13 @@
   .styled-input {
     @apply w-full bg-muted/40 border border-border/60 hover:border-border rounded-xl px-4 py-2.5 text-sm font-medium transition-all focus:bg-card focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-muted-foreground/50;
   }
+
+  @keyframes bounce-subtle {
+    0%, 100% { transform: translateY(0) rotate(6deg); }
+    50% { transform: translateY(-10px) rotate(6deg); }
+  }
+
+  .animate-bounce-subtle {
+    animation: bounce-subtle 3s ease-in-out infinite;
+  }
 }

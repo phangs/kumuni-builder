@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, Plus, X, Globe, Lock, Shield, Info } from 'lucide-react';
+import { Save, Plus, X, Globe, Lock, Shield, Info, Image as ImageIcon } from 'lucide-react';
 
 interface SettingsPanelProps {
   schema: any;
@@ -7,72 +7,71 @@ interface SettingsPanelProps {
 }
 
 export const SettingsPanel: React.FC<SettingsPanelProps> = ({ schema, onUpdateSchema }) => {
-  const [settings, setSettings] = useState({
-    id: schema.id || 'builder-app',
-    name: schema.name || '',
-    version: schema.version || '1.0.0',
-    description: schema.description || '',
-    slug: schema.slug || '',
-    permissions: schema.permissions ? [...schema.permissions] : [],
-    statuses: schema.statuses ? [...schema.statuses] : [],
-  });
-
   const [newPermission, setNewPermission] = useState('');
   const [newStatus, setNewStatus] = useState('');
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setSettings(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSave = () => {
-    const updatedSchema = {
+    let updatedSchema = {
       ...schema,
-      id: settings.id,
-      name: settings.name,
-      version: settings.version,
-      description: settings.description,
-      slug: settings.slug,
-      permissions: settings.permissions,
-      statuses: settings.statuses,
+      [field]: value
     };
+
+    // Auto-generate slug when name changes
+    if (field === 'name' && typeof value === 'string') {
+      const slug = value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
+      updatedSchema = {
+        ...updatedSchema,
+        slug
+      };
+    }
+
     onUpdateSchema(updatedSchema);
   };
 
   const addPermission = () => {
-    if (newPermission.trim() && !settings.permissions.includes(newPermission.trim())) {
-      setSettings(prev => ({
-        ...prev,
-        permissions: [...prev.permissions, newPermission.trim()]
-      }));
+    const currentPermissions = schema.permissions || [];
+    if (newPermission.trim() && !currentPermissions.includes(newPermission.trim())) {
+      const updatedSchema = {
+        ...schema,
+        permissions: [...currentPermissions, newPermission.trim()]
+      };
+      onUpdateSchema(updatedSchema);
       setNewPermission('');
     }
   };
 
   const removePermission = (permission: string) => {
-    setSettings(prev => ({
-      ...prev,
-      permissions: prev.permissions.filter(p => p !== permission)
-    }));
+    const currentPermissions = schema.permissions || [];
+    const updatedSchema = {
+      ...schema,
+      permissions: currentPermissions.filter((p: string) => p !== permission)
+    };
+    onUpdateSchema(updatedSchema);
   };
 
   const addStatus = () => {
-    if (newStatus.trim() && !settings.statuses.includes(newStatus.trim())) {
-      setSettings(prev => ({
-        ...prev,
-        statuses: [...prev.statuses, newStatus.trim()]
-      }));
+    const currentStatuses = schema.statuses || [];
+    if (newStatus.trim() && !currentStatuses.includes(newStatus.trim())) {
+      const updatedSchema = {
+        ...schema,
+        statuses: [...currentStatuses, newStatus.trim()]
+      };
+      onUpdateSchema(updatedSchema);
       setNewStatus('');
     }
   };
 
   const removeStatus = (status: string) => {
-    setSettings(prev => ({
-      ...prev,
-      statuses: prev.statuses.filter(s => s !== status)
-    }));
+    const currentStatuses = schema.statuses || [];
+    const updatedSchema = {
+      ...schema,
+      statuses: currentStatuses.filter((s: string) => s !== status)
+    };
+    onUpdateSchema(updatedSchema);
   };
 
   return (
@@ -84,7 +83,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ schema, onUpdateSc
           <InputGroup label="Application ID" description="Unique identifier for the app.">
             <input
               type="text"
-              value={settings.id}
+              value={schema.id || ''}
               onChange={(e) => handleInputChange('id', e.target.value)}
               className="styled-input"
               placeholder="e.g. sample-builder-app"
@@ -94,7 +93,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ schema, onUpdateSc
           <InputGroup label="Display Name">
             <input
               type="text"
-              value={settings.name}
+              value={schema.name || ''}
               onChange={(e) => handleInputChange('name', e.target.value)}
               className="styled-input"
               placeholder="e.g. My Awesome App"
@@ -105,7 +104,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ schema, onUpdateSc
             <InputGroup label="Version">
               <input
                 type="text"
-                value={settings.version}
+                value={schema.version || ''}
                 onChange={(e) => handleInputChange('version', e.target.value)}
                 className="styled-input"
                 placeholder="1.0.0"
@@ -114,7 +113,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ schema, onUpdateSc
             <InputGroup label="URL Slug">
               <input
                 type="text"
-                value={settings.slug}
+                value={schema.slug || ''}
                 onChange={(e) => handleInputChange('slug', e.target.value)}
                 className="styled-input"
                 placeholder="my-awesome-app"
@@ -122,9 +121,37 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ schema, onUpdateSc
             </InputGroup>
           </div>
 
+          <InputGroup label="App Icon URL" description="Direct URL to your application icon image.">
+            <div className="flex gap-3 items-start">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={schema.icon || ''}
+                  onChange={(e) => handleInputChange('icon', e.target.value)}
+                  className="styled-input"
+                  placeholder="https://example.com/icon.png"
+                />
+              </div>
+              <div className="w-12 h-12 rounded-xl border border-border/60 bg-muted/30 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                {schema.icon ? (
+                  <img
+                    src={schema.icon}
+                    alt="App Icon Preview"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48?text=Error';
+                    }}
+                  />
+                ) : (
+                  <ImageIcon size={20} className="text-muted-foreground/40" />
+                )}
+              </div>
+            </div>
+          </InputGroup>
+
           <InputGroup label="Description">
             <textarea
-              value={settings.description}
+              value={schema.description || ''}
               onChange={(e) => handleInputChange('description', e.target.value)}
               className="styled-input min-h-[80px]"
               rows={3}
@@ -158,10 +185,10 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ schema, onUpdateSc
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {settings.permissions.map((permission, index) => (
+              {(schema.permissions || []).map((permission: string, index: number) => (
                 <Tag key={index} label={permission} onRemove={() => removePermission(permission)} color="primary" />
               ))}
-              {settings.permissions.length === 0 && <p className="text-[11px] text-muted-foreground italic px-1">No permissions defined yet.</p>}
+              {(!schema.permissions || schema.permissions.length === 0) && <p className="text-[11px] text-muted-foreground italic px-1">No permissions defined yet.</p>}
             </div>
           </div>
 
@@ -185,23 +212,13 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ schema, onUpdateSc
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {settings.statuses.map((status, index) => (
+              {(schema.statuses || []).map((status: string, index: number) => (
                 <Tag key={index} label={status} onRemove={() => removeStatus(status)} color="accent" />
               ))}
-              {settings.statuses.length === 0 && <p className="text-[11px] text-muted-foreground italic px-1">No statuses defined yet.</p>}
+              {(!schema.statuses || schema.statuses.length === 0) && <p className="text-[11px] text-muted-foreground italic px-1">No statuses defined yet.</p>}
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="pt-4 px-1">
-        <button
-          onClick={handleSave}
-          className="w-full py-3.5 bg-primary text-primary-foreground rounded-2xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 transition-all text-sm leading-none"
-        >
-          <Save size={16} />
-          Save Application Settings
-        </button>
       </div>
     </div>
   );

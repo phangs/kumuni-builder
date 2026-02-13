@@ -12,10 +12,12 @@ import { useScreenScaling } from './hooks/useScreenScaling';
 import { useAuth } from './contexts/AuthContext';
 import { UserProfileMenu } from './components/UserProfileMenu';
 import { MainLayout } from './components/MainLayout';
+import { useParams } from 'react-router-dom';
 
 function App() {
   // Main application code for authenticated users
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
   const [selectedComponent, setSelectedComponent] = useState<any>(null);
   const [currentPageId, setCurrentPageId] = useState<string>('welcome'); // Will be updated after schema loads
   const [selectedTab, setSelectedTab] = useState<'properties' | 'settings'>('properties');
@@ -32,6 +34,7 @@ function App() {
     name: "Builder App",
     description: "SDUI Builder Application",
     slug: "builder-app",
+    icon: "",
     is_public: false,
     is_published: false,
     published_at: null,
@@ -54,7 +57,56 @@ function App() {
     updated_at: new Date().toISOString()
   });
 
-  // Update currentPageId when schema changes (but not during import and only if navigation settings changed)
+  // Fetch app schema if an ID is provided
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    const fetchApp = async () => {
+      if (!id) return;
+
+      const token = localStorage.getItem('kumuni-token');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BUILDER_API_BASE_URL}/builder/miniapps/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+          },
+          signal
+        });
+
+        if (response.ok) {
+          const responseData = await response.json();
+          // Handle both wrapped { success: true, data: { ... } } and unwrapped { ... } response formats
+          const appData = responseData.data || responseData;
+
+          if (!signal.aborted && appData.sduiSchema) {
+            setIsImporting(true);
+            setCanvasSchema(appData.sduiSchema);
+            setTimeout(() => setIsImporting(false), 100);
+            toast.success(`Loaded app: ${appData.name}`);
+          }
+        } else {
+          if (!signal.aborted) {
+            toast.error('Failed to load the application.');
+          }
+        }
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          console.error('Error fetching app:', error);
+          toast.error('An error occurred while loading the application.');
+        }
+      }
+    };
+
+    fetchApp();
+
+    return () => {
+      controller.abort();
+    };
+  }, [id, toast]);
   useEffect(() => {
     if (!isImporting) {
       const currentNav = canvasSchema.navigation;
@@ -225,6 +277,11 @@ function App() {
           label: 'Select Date',
           placeholder: 'Select date'
         };
+      case 'checkbox':
+        return {
+          label: 'Checkbox Label',
+          style: {}
+        };
       case 'image':
         return {
           source: 'https://via.placeholder.com/150',
@@ -317,10 +374,47 @@ function App() {
           };
           fileInput.click();
         }}
-        onSaveClick={() => {
-          // Save schema functionality would go here
-          console.log('Saving schema:', canvasSchema);
-          toast.success('Schema saved successfully!');
+        onSaveClick={async () => {
+          const token = localStorage.getItem('kumuni-token');
+          if (!token) {
+            toast.error('You must be logged in to save.');
+            return;
+          }
+
+          const method = id ? 'PATCH' : 'POST';
+          const url = id
+            ? `${import.meta.env.VITE_BUILDER_API_BASE_URL}/builder/miniapps/${id}`
+            : `${import.meta.env.VITE_BUILDER_API_BASE_URL}/builder/miniapps`;
+
+          try {
+            const response = await fetch(url, {
+              method: method,
+              headers: {
+                'accept': '*/*',
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                name: canvasSchema.name || 'Untitled App',
+                description: canvasSchema.description || '',
+                iconUrl: canvasSchema.icon || '',
+                category: 'default',
+                provider: 'system',
+                status: 'draft',
+                sduiSchema: canvasSchema
+              }),
+            });
+
+            if (response.ok) {
+              toast.success(`Mini-app ${id ? 'updated' : 'saved'} successfully!`);
+            } else {
+              const errorData = await response.json().catch(() => ({}));
+              toast.error(`Failed to save: ${errorData.message || 'Unknown error'}`);
+            }
+          } catch (error) {
+            console.error('Save error:', error);
+            toast.error('An error occurred while saving.');
+          }
         }}
         onPreviewClick={() => {
           // Preview functionality - set the schema and current page ID to state to show modal

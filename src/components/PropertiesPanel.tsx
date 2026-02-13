@@ -502,6 +502,22 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
         </>
       )}
 
+      {component.type === 'checkbox' && (
+        <>
+          <SectionHeader title="Checkbox Properties" />
+
+          <InputGroup label="Field Label">
+            <input
+              type="text"
+              value={component.props?.label || ''}
+              onChange={(e) => handlePropsChange('label', e.target.value)}
+              className="styled-input"
+              placeholder="e.g. I agree to the terms"
+            />
+          </InputGroup>
+        </>
+      )}
+
       {component.type === 'image' && (
         <InputGroup label="Image Source (URL)" description="Provide a direct link to the image you want to display.">
           <input

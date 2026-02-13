@@ -1,14 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { User, Settings, LayoutGrid, LogOut, ChevronDown } from 'lucide-react';
+import { User, Settings, LayoutGrid, LogOut, ChevronDown, Users, LayoutDashboard } from 'lucide-react';
 
 interface UserProfileMenuProps {
   user?: {
     id: string;
     email: string;
-    firstName: string;
-    lastName: string;
+    fullName: string;
+    company: string;
+    role?: string;
   } | null;
 }
 
@@ -45,7 +46,11 @@ export const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ user }) => {
     );
   }
 
-  const initials = `${user.firstName?.charAt(0) || 'U'}${user.lastName?.charAt(0) || 'S'}`.toUpperCase();
+  const initials = user.fullName
+    ? user.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+    : user.email.charAt(0).toUpperCase();
+
+  const isAdmin = user.role === 'Admin';
 
   return (
     <div className="relative" ref={menuRef} style={{ zIndex: 1000 }}>
@@ -65,7 +70,7 @@ export const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ user }) => {
           </div>
         </div>
         <div className="hidden md:block text-left">
-          <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors leading-none mb-1">{user.firstName} {user.lastName}</p>
+          <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors leading-none mb-1">{user.fullName}</p>
           <p className="text-[10px] font-medium text-muted-foreground opacity-60 leading-none">{user.email}</p>
         </div>
         <ChevronDown
@@ -87,11 +92,28 @@ export const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ user }) => {
               label="Preferences"
               onClick={() => { navigate('/settings'); setIsOpen(false); }}
             />
-            <MenuLink
-              icon={<LayoutGrid size={16} />}
-              label="My Applications"
-              onClick={() => { navigate('/my-apps'); setIsOpen(false); }}
-            />
+
+            {/* Conditional menu items based on role */}
+            {isAdmin ? (
+              <>
+                <MenuLink
+                  icon={<LayoutDashboard size={16} />}
+                  label="Dashboard"
+                  onClick={() => { navigate('/admin/dashboard'); setIsOpen(false); }}
+                />
+                <MenuLink
+                  icon={<Users size={16} />}
+                  label="Developers"
+                  onClick={() => { navigate('/admin/developers'); setIsOpen(false); }}
+                />
+              </>
+            ) : (
+              <MenuLink
+                icon={<LayoutGrid size={16} />}
+                label="My Applications"
+                onClick={() => { navigate('/my-apps'); setIsOpen(false); }}
+              />
+            )}
 
             <div className="h-px bg-border/40 my-2 mx-3"></div>
 

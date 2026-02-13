@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from './MainLayout';
-import { Plus, Search, Filter, LayoutGrid, Calendar, Clock, Edit3, Eye, MoreVertical } from 'lucide-react';
+import { Plus, Search, Filter, LayoutGrid, Calendar, Clock, Edit3, Eye, MoreVertical, Trash2, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface AppItem {
@@ -13,6 +13,7 @@ interface AppItem {
   createdAt: string;
   updatedAt: string;
   lastEdited: string;
+  iconUrl?: string;
 }
 
 export const MyAppsPage: React.FC = () => {
@@ -22,59 +23,197 @@ export const MyAppsPage: React.FC = () => {
   const [filteredApps, setFilteredApps] = useState<AppItem[]>([]);
   const [filter, setFilter] = useState<'all' | 'draft' | 'published'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [activeMenuAppId, setActiveMenuAppId] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
-  // Mock data for demonstration
-  useEffect(() => {
-    const mockApps: AppItem[] = [
-      {
-        id: '1',
-        name: 'E-commerce App',
-        description: 'A full-featured e-commerce application',
-        status: 'published',
-        createdAt: '2023-01-15',
-        updatedAt: '2023-05-20',
-        lastEdited: '2023-05-20'
-      },
-      {
-        id: '2',
-        name: 'Task Manager',
-        description: 'Simple task management application',
-        status: 'draft',
-        createdAt: '2023-02-10',
-        updatedAt: '2023-03-12',
-        lastEdited: '2023-03-12'
-      },
-      {
-        id: '3',
-        name: 'Blog Platform',
-        description: 'Content management system for blogs',
-        status: 'published',
-        createdAt: '2023-01-22',
-        updatedAt: '2023-06-18',
-        lastEdited: '2023-06-18'
-      },
-      {
-        id: '4',
-        name: 'Fitness Tracker',
-        description: 'Track workouts and nutrition',
-        status: 'draft',
-        createdAt: '2023-03-05',
-        updatedAt: '2023-04-10',
-        lastEdited: '2023-04-10'
-      },
-      {
-        id: '5',
-        name: 'Social Media Dashboard',
-        description: 'Manage multiple social media accounts',
-        status: 'published',
-        createdAt: '2023-02-28',
-        updatedAt: '2023-07-01',
-        lastEdited: '2023-07-01'
+  const handleCreateApp = async () => {
+    const token = localStorage.getItem('kumuni-token');
+    if (!token) return;
+
+    setIsCreating(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BUILDER_API_BASE_URL}/builder/miniapps`, {
+        method: 'POST',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: "Untitled App",
+          description: "Blank app template",
+          iconUrl: "",
+          category: "default",
+          provider: "system",
+          sduiSchema: {
+            id: "untitled-app",
+            version: "1.0",
+            name: "Untitled App",
+            description: "SDUI Builder Application",
+            slug: "untitled-app",
+            icon: "",
+            is_public: false,
+            is_published: false,
+            published_at: null,
+            navigation: {
+              initialPageId: "welcome"
+            },
+            pages: [
+              {
+                id: "welcome",
+                order: 0,
+                "title": "Welcome",
+                components: []
+              }
+            ],
+            metadata: {
+              revision: 1,
+              createdBy: user?.id || "builder"
+            },
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Handle wrapped response structure: { success: true, data: { ... } }
+        const newApp = result.success && result.data ? result.data : result;
+
+        if (newApp && newApp.id) {
+          navigate(`/builder/${newApp.id}`);
+        } else {
+          // Fallback to pure builder if no ID returned (shouldn't happen with correct API)
+          navigate('/builder');
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        alert(`Failed to create app: ${errorData.message || 'Unknown error'}`);
       }
-    ];
+    } catch (error) {
+      console.error('Error creating app:', error);
+      alert('An error occurred while creating the application.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
-    setApps(mockApps);
-    setFilteredApps(mockApps);
+  const handleSubmitForReview = async (appId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (!window.confirm('Are you sure you want to submit this app for review?')) return;
+
+    const token = localStorage.getItem('kumuni-token');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BUILDER_API_BASE_URL}/builder/miniapps/${appId}/submit`, {
+        method: 'POST',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        alert('App submitted for review successfully!');
+        // Refresh apps
+        fetchApps();
+        setActiveMenuAppId(null);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        alert(`Failed to submit: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error submitting app:', error);
+      alert('An error occurred while submitting.');
+    }
+  };
+
+  const handleDeleteApp = async (appId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this app?')) return;
+
+    const token = localStorage.getItem('kumuni-token');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BUILDER_API_BASE_URL}/builder/miniapps/${appId}`, {
+        method: 'DELETE',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setApps(prev => prev.filter(app => app.id !== appId));
+        setActiveMenuAppId(null);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        alert(`Failed to delete: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error deleting app:', error);
+      alert('An error occurred while deleting.');
+    }
+  };
+
+  // Fetch mini-apps from the backend API
+  const fetchApps = async () => {
+    const token = localStorage.getItem('kumuni-token');
+    if (!token) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BUILDER_API_BASE_URL}/builder/miniapps`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Handle wrapped response structure: { success: true, data: [...] }
+        const appsList = result.success && Array.isArray(result.data)
+          ? result.data
+          : (Array.isArray(result) ? result : []);
+
+        const mappedApps: AppItem[] = appsList.map((app: any) => ({
+          id: app.id,
+          name: app.name,
+          description: app.description || '',
+          iconUrl: app.iconUrl,
+          status: app.status === 'published' ? 'published' : 'draft',
+          createdAt: app.created_at || app.createdAt || new Date().toISOString(),
+          updatedAt: app.updated_at || app.updatedAt || new Date().toISOString(),
+          lastEdited: app.updated_at || app.updatedAt || new Date().toISOString(),
+        }));
+
+        setApps(mappedApps);
+        setFilteredApps(mappedApps);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMsg = errorData.message || 'Failed to fetch applications';
+        setError(errorMsg);
+        console.error('Failed to fetch apps:', errorMsg);
+      }
+    } catch (error) {
+      setError('An error occurred while connecting to the server');
+      console.error('Error fetching apps:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchApps();
   }, []);
 
   // Filter apps based on status and search term
@@ -128,11 +267,12 @@ export const MyAppsPage: React.FC = () => {
                 </p>
               </div>
               <button
-                onClick={() => navigate('/builder')}
-                className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 transition-all text-sm leading-none"
+                onClick={handleCreateApp}
+                disabled={isCreating}
+                className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold shadow-xl shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 transition-all text-sm leading-none disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                <Plus size={18} strokeWidth={3} />
-                Create New App
+                <Plus size={18} strokeWidth={3} className={isCreating ? "animate-spin" : ""} />
+                {isCreating ? 'Creating...' : 'Create New App'}
               </button>
             </div>
           </div>
@@ -169,7 +309,43 @@ export const MyAppsPage: React.FC = () => {
             </div>
           </div>
 
-          {filteredApps.length === 0 ? (
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-card/50 border border-border/40 rounded-[2rem] p-6 h-64 animate-pulse flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="w-12 h-12 bg-muted rounded-2xl" />
+                    <div className="h-6 bg-muted rounded-lg w-3/4" />
+                    <div className="h-4 bg-muted rounded-lg w-full" />
+                    <div className="h-4 bg-muted rounded-lg w-5/6" />
+                  </div>
+                  <div className="flex justify-between items-end">
+                    <div className="h-4 bg-muted rounded-lg w-1/4" />
+                    <div className="flex gap-2">
+                      <div className="w-10 h-10 bg-muted rounded-xl" />
+                      <div className="w-10 h-10 bg-muted rounded-xl" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-24 px-6 text-center bg-card/40 rounded-[3rem] border border-dashed border-destructive/30 animate-in fade-in zoom-in-95 duration-500">
+              <div className="w-20 h-20 bg-destructive/10 rounded-3xl flex items-center justify-center mb-6 text-destructive">
+                <MoreVertical className="rotate-90" size={40} />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-2">Sync Error</h3>
+              <p className="text-muted-foreground max-w-sm mb-8 leading-relaxed">
+                {error}
+              </p>
+              <button
+                onClick={() => fetchApps()}
+                className="px-6 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-sm font-bold transition-all shadow-lg shadow-primary/20"
+              >
+                Retry Synchronization
+              </button>
+            </div>
+          ) : filteredApps.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 px-6 text-center bg-card/40 rounded-[3rem] border border-dashed border-border/60 animate-in fade-in zoom-in-95 duration-500">
               <div className="w-20 h-20 bg-muted/50 rounded-3xl flex items-center justify-center mb-6 text-muted-foreground/40">
                 <LayoutGrid size={40} />
@@ -181,10 +357,11 @@ export const MyAppsPage: React.FC = () => {
                   : `We couldn't find any ${filter} applications matching your criteria.`}
               </p>
               <button
-                onClick={() => navigate('/builder')}
-                className="px-6 py-2.5 bg-muted text-foreground hover:bg-muted/80 rounded-xl text-sm font-bold transition-all border border-border"
+                onClick={handleCreateApp}
+                disabled={isCreating}
+                className="px-6 py-2.5 bg-muted text-foreground hover:bg-muted/80 rounded-xl text-sm font-bold transition-all border border-border disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Get Started Now
+                {isCreating ? 'Creating...' : 'Get Started Now'}
               </button>
             </div>
           ) : (
@@ -197,17 +374,58 @@ export const MyAppsPage: React.FC = () => {
                   key={app.id}
                   className="group bg-card hover:bg-card/80 border border-border/40 hover:border-primary/30 rounded-[2rem] p-6 transition-all duration-300 shadow-lg shadow-black/5 hover:shadow-primary/5 relative overflow-hidden flex flex-col h-full"
                 >
-                  <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted/50 text-muted-foreground transition-colors">
-                      <MoreVertical size={16} />
-                    </button>
+                  <div className={`absolute top-0 right-0 p-4 transition-opacity z-20 ${activeMenuAppId === app.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                    <div className="relative">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveMenuAppId(activeMenuAppId === app.id ? null : app.id);
+                        }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted/50 text-muted-foreground transition-colors bg-card/80 backdrop-blur-sm shadow-sm"
+                      >
+                        <MoreVertical size={16} />
+                      </button>
+
+                      {activeMenuAppId === app.id && (
+                        <div className="absolute right-0 top-full mt-2 w-32 bg-card border border-border/60 rounded-xl shadow-xl overflow-hidden py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
+                          <button
+                            onClick={(e) => handleSubmitForReview(app.id, e)}
+                            className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted/50 flex items-center gap-2 transition-colors border-b border-border/40"
+                          >
+                            <Send size={14} />
+                            Submit for Review
+                          </button>
+                          <button
+                            onClick={(e) => handleDeleteApp(app.id, e)}
+                            className="w-full text-left px-4 py-2 text-sm text-destructive hover:bg-destructive/10 flex items-center gap-2 transition-colors"
+                          >
+                            <Trash2 size={14} />
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="mb-6">
                     <div className="flex justify-between items-start mb-4">
-                      <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500">
-                        <LayoutGrid size={24} />
-                      </div>
+                      {app.iconUrl ? (
+                        <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-sm border border-border/40 group-hover:scale-110 transition-transform duration-500 bg-white">
+                          <img
+                            src={app.iconUrl}
+                            alt={app.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).parentElement?.classList.add('hidden');
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500">
+                          <LayoutGrid size={24} />
+                        </div>
+                      )}
                     </div>
                     <div className="space-y-1">
                       <h3 className="text-xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">{app.name}</h3>
@@ -232,7 +450,7 @@ export const MyAppsPage: React.FC = () => {
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => navigate('/builder')}
+                        onClick={() => navigate(`/builder/${app.id}`)}
                         className="w-10 h-10 rounded-xl bg-primary shadow-lg shadow-primary/20 flex items-center justify-center text-primary-foreground hover:scale-110 active:scale-95 transition-all"
                       >
                         <Edit3 size={18} />

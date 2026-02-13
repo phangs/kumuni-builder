@@ -7,7 +7,8 @@ import {
   Calendar,
   Image as ImageIcon,
   GripHorizontal,
-  Layout
+  Layout,
+  CheckSquare
 } from 'lucide-react';
 
 interface ComponentsPanelProps {
@@ -22,6 +23,7 @@ export const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ onAddComponent
     { type: 'text-input', label: 'Text Input', icon: <Square size={16} /> },
     { type: 'textarea', label: 'Textarea', icon: <GripHorizontal size={16} /> },
     { type: 'date-picker', label: 'Date Picker', icon: <Calendar size={16} /> },
+    { type: 'checkbox', label: 'Checkbox', icon: <CheckSquare size={16} /> },
     { type: 'image', label: 'Image', icon: <ImageIcon size={16} /> },
     { type: 'spacer', label: 'Spacer', icon: <Layout size={16} /> },
   ];

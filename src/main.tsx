@@ -9,6 +9,9 @@ import { MyAppsPage } from './components/MyAppsPage';
 import { ProfilePage } from './components/ProfilePage';
 import { SettingsPage } from './components/SettingsPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AdminDashboard } from './components/AdminDashboard';
+import { AdminReviewPage } from './components/AdminReviewPage';
+import { DevelopersPage } from './components/DevelopersPage';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -26,11 +29,17 @@ const AppWrapper: React.FC = () => {
               <Route path="/" element={<Navigate to="/my-apps" replace />} />
 
               {/* Protected Routes */}
-              <Route path="/builder" element={<ProtectedRoute><App /></ProtectedRoute>} />
+              <Route path="/builder/:id?" element={<ProtectedRoute><App /></ProtectedRoute>} />
               <Route path="/preview" element={<ProtectedRoute><PreviewPage /></ProtectedRoute>} />
               <Route path="/my-apps" element={<ProtectedRoute><MyAppsPage /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+
+              {/* Admin Routes */}
+              <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin/review/:id" element={<ProtectedRoute><AdminReviewPage /></ProtectedRoute>} />
+              <Route path="/admin/developers" element={<ProtectedRoute><DevelopersPage /></ProtectedRoute>} />
+
 
               <Route path="*" element={<Navigate to="/my-apps" replace />} />
             </Routes>

@@ -37,6 +37,7 @@ export interface SDUISchema {
   name: string;
   description: string;
   slug: string;
+  icon?: string;
   is_public: boolean;
   is_published: boolean;
   published_at: string | null;
