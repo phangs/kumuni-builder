@@ -23,6 +23,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const handleLogoClick = () => {
+    // Navigate based on user role
+    if (user?.role === 'Admin') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/my-apps');
+    }
+  };
+
   return (
     <div className="dark h-screen flex flex-col bg-background text-foreground overflow-hidden selection:bg-primary/20 selection:text-primary">
       {/* Top toolbar */}
@@ -35,7 +44,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           </div>
           <h1
             className="text-lg font-bold tracking-tight text-foreground cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => navigate('/my-apps')}
+            onClick={handleLogoClick}
           >
             Kumuni <span className="text-primary">Builder</span>
           </h1>

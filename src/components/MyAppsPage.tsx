@@ -28,6 +28,12 @@ export const MyAppsPage: React.FC = () => {
   const [activeMenuAppId, setActiveMenuAppId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
+  // Delete confirmation modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [appToDelete, setAppToDelete] = useState<AppItem | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const handleCreateApp = async () => {
     const token = localStorage.getItem('kumuni-token');
     if (!token) return;
@@ -133,15 +139,30 @@ export const MyAppsPage: React.FC = () => {
     }
   };
 
-  const handleDeleteApp = async (appId: string, event: React.MouseEvent) => {
+  const openDeleteModal = (app: AppItem, event: React.MouseEvent) => {
     event.stopPropagation();
-    if (!window.confirm('Are you sure you want to delete this app?')) return;
+    setAppToDelete(app);
+    setDeleteConfirmText('');
+    setDeleteModalOpen(true);
+    setActiveMenuAppId(null);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setAppToDelete(null);
+    setDeleteConfirmText('');
+  };
+
+  const handleDeleteApp = async () => {
+    if (!appToDelete || deleteConfirmText !== appToDelete.name) return;
 
     const token = localStorage.getItem('kumuni-token');
     if (!token) return;
 
+    setIsDeleting(true);
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_BUILDER_API_BASE_URL}/builder/miniapps/${appId}`, {
+      const response = await fetch(`${import.meta.env.VITE_BUILDER_API_BASE_URL}/builder/miniapps/${appToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'accept': '*/*',
@@ -150,8 +171,9 @@ export const MyAppsPage: React.FC = () => {
       });
 
       if (response.ok) {
-        setApps(prev => prev.filter(app => app.id !== appId));
-        setActiveMenuAppId(null);
+        setApps(prev => prev.filter(app => app.id !== appToDelete.id));
+        closeDeleteModal();
+        alert('App deleted successfully!');
       } else {
         const errorData = await response.json().catch(() => ({}));
         alert(`Failed to delete: ${errorData.message || 'Unknown error'}`);
@@ -159,6 +181,8 @@ export const MyAppsPage: React.FC = () => {
     } catch (error) {
       console.error('Error deleting app:', error);
       alert('An error occurred while deleting.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -396,7 +420,7 @@ export const MyAppsPage: React.FC = () => {
                             Submit for Review
                           </button>
                           <button
-                            onClick={(e) => handleDeleteApp(app.id, e)}
+                            onClick={(e) => openDeleteModal(app, e)}
                             className="w-full text-left px-4 py-2 text-sm text-destructive hover:bg-destructive/10 flex items-center gap-2 transition-colors"
                           >
                             <Trash2 size={14} />
@@ -466,6 +490,54 @@ export const MyAppsPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && appToDelete && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={closeDeleteModal}
+          />
+          <div className="relative bg-card border border-border rounded-[2rem] shadow-2xl w-full max-w-md p-8 animate-in zoom-in-95 duration-300">
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-16 h-16 bg-destructive/10 rounded-2xl flex items-center justify-center text-destructive mb-4">
+                <Trash2 size={32} />
+              </div>
+              <h2 className="text-2xl font-bold tracking-tight">Intentional Check</h2>
+              <p className="text-muted-foreground mt-2">
+                This action cannot be undone. To delete <strong>{appToDelete.name}</strong>, please type the app name below.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Type application name..."
+                autoFocus
+                className="w-full bg-muted/30 border border-border hover:border-border/80 focus:border-destructive rounded-2xl px-6 py-4 text-sm font-medium transition-all focus:outline-none focus:ring-4 focus:ring-destructive/5 placeholder:text-muted-foreground/30"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+              />
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={closeDeleteModal}
+                  className="flex-1 px-6 py-4 rounded-2xl font-bold bg-muted hover:bg-muted/80 transition-all text-sm leading-none"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteApp}
+                  disabled={deleteConfirmText !== appToDelete.name || isDeleting}
+                  className="flex-1 px-6 py-4 rounded-2xl font-bold bg-destructive text-white shadow-xl shadow-destructive/20 hover:shadow-destructive/30 hover:-translate-y-0.5 active:translate-y-0 transition-all text-sm leading-none disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete Permanently'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };

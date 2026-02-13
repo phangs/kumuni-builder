@@ -9,6 +9,7 @@ import { MyAppsPage } from './components/MyAppsPage';
 import { ProfilePage } from './components/ProfilePage';
 import { SettingsPage } from './components/SettingsPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { RoleBasedRedirect } from './components/RoleBasedRedirect';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AdminReviewPage } from './components/AdminReviewPage';
 import { DevelopersPage } from './components/DevelopersPage';
@@ -26,7 +27,7 @@ const AppWrapper: React.FC = () => {
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-              <Route path="/" element={<Navigate to="/my-apps" replace />} />
+              <Route path="/" element={<RoleBasedRedirect />} />
 
               {/* Protected Routes */}
               <Route path="/builder/:id?" element={<ProtectedRoute><App /></ProtectedRoute>} />
@@ -41,7 +42,7 @@ const AppWrapper: React.FC = () => {
               <Route path="/admin/developers" element={<ProtectedRoute><DevelopersPage /></ProtectedRoute>} />
 
 
-              <Route path="*" element={<Navigate to="/my-apps" replace />} />
+              <Route path="*" element={<RoleBasedRedirect />} />
             </Routes>
           </BrowserRouter>
         </ToastProvider>
